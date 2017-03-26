@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#EEEEEE">
+
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:contentPadding="3dp"
+        card_view:cardCornerRadius="5dp"
+        card_view:cardElevation="2dp"
+        android:id="@+id/card_view2"
+        app:cardBackgroundColor="#FAFAFA"
+        app:cardCornerRadius="5dp"
+        card_view:cardUseCompatPadding="true">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/colorPrimary">
+
+                <TextView
+                    android:id="@+id/fetch_pathology_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="@string/demo"
+                    android:textAlignment="center"
+                    android:textColor="@color/Black"
+                    android:textSize="20sp"
+                    android:textStyle="bold|italic" />
+            </LinearLayout>
+            <View
+                android:id="@+id/show_pathology_view2"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:background="#ff0aad" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:text="Phone No : "
+                    android:textColor="@color/Black"
+                    android:textStyle="normal|bold" />
+
+                <TextView
+                    android:id="@+id/fetch_pathology_phone"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="3"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:text="@string/demo"
+                    android:textColor="@color/Black" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView10"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:text="Address : "
+                    android:textColor="@color/Black"
+                    android:textStyle="normal|bold" />
+
+                <TextView
+                    android:id="@+id/fetch_pathology_address"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="3"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="@string/demo"
+                    android:textColor="@color/Black"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/show_pathology_view"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:background="#ff0aad" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:id="@+id/fetch_pathology_website_linearlayout">
+
+                <ImageView
+                    android:id="@+id/fetch_pathology_website_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/website_icon"
+                    android:textStyle="normal|bold" />
+
+                <TextView
+                    android:id="@+id/fetch_pathology_website"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="Website"
+                    android:textColor="#e61c92"
+                    android:textStyle="normal|bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:id="@+id/fetch_pathology_direction_linearlayout"
+                   >
+
+                    <ImageView
+                        android:id="@+id/fetch_pathology_direction_icon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_margin="5dp"
+                        android:src="@drawable/direction_icon"
+                        android:textStyle="normal|bold" />
+
+                    <TextView
+                        android:id="@+id/fetch_pathology_direction"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:text="Direction"
+                        android:textColor="#e61c92"
+                        android:textStyle="normal|bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </android.support.v7.widget.CardView>
+</LinearLayout>

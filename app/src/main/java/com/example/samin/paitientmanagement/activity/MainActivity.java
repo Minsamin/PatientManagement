@@ -30,8 +30,11 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.samin.paitientmanagement.BuildConfig;
 import com.example.samin.paitientmanagement.R;
 import com.example.samin.paitientmanagement.fragment.AppointmentFragment;
+import com.example.samin.paitientmanagement.fragment.BloodBankFragment;
+import com.example.samin.paitientmanagement.fragment.HealthTipsFragment;
 import com.example.samin.paitientmanagement.fragment.HomeFragment;
 import com.example.samin.paitientmanagement.fragment.NotificationFragment;
+import com.example.samin.paitientmanagement.fragment.PathologyLabsFragment;
 import com.example.samin.paitientmanagement.fragment.PatientFragment;
 import com.example.samin.paitientmanagement.fragment.ProfileFragment;
 import com.example.samin.paitientmanagement.fragment.SettingsFragment;
@@ -42,7 +45,14 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.onesignal.OneSignal;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Map;
+import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,11 +67,14 @@ public class MainActivity extends AppCompatActivity {
 
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
-    private static final String TAG_APPOINTMENT = "appointment";
+    private static final String TAG_APPOINTMENT = "make appointment";
     private static final String TAG_PATIENT = "patient";
     private static final String TAG_NOTIFICATIONS = "notifications";
     private static final String TAG_SETTINGS = "settings";
     private static final String TAG_PROFILE = "profile";
+    private static final String TAG_HEALTH_TIPS = "health tips";
+    private static final String TAG_PATHOLOGY_LABS = "pathology labs";
+    private static final String TAG_BLOOD_BANKS = "blood banks";
     public static String CURRENT_TAG = TAG_HOME;
 
     // toolbar titles respected to selected nav menu item
@@ -71,21 +84,21 @@ public class MainActivity extends AppCompatActivity {
     //private boolean shouldLoadHomeFragOnBackPress = true;
     private Handler mHandler;
     private FirebaseAuth firebaseAuth;
+    Firebase mRoofRef;
+    FirebaseUser user;
 
-    String UserID;
+    static public String UserID,LoggedIn_User_Email;
     AlertDialog.Builder builder;
     String check;
     String version;
+    //static public String user_designation;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
+        OneSignal.startInit(this).init();
         firebaseAuth = FirebaseAuth.getInstance();
         if(firebaseAuth.getCurrentUser() == null)
         {
@@ -93,6 +106,29 @@ public class MainActivity extends AppCompatActivity {
             finish();
             startActivity(new Intent(getApplicationContext(),login_activity.class));
         }
+
+
+        user = firebaseAuth.getCurrentUser();
+        UserID = user.getEmail().replace("@", "").replace(".", "");
+
+        LoggedIn_User_Email = user.getEmail();
+
+
+        OneSignal.sendTag("User_ID", LoggedIn_User_Email);
+
+
+
+        mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
+//        if(UserID.equals("saminali500gmailcom"))
+//            user_designation ="Doctor";
+
+
+            setContentView(R.layout.activity_main);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
+
 
         version = BuildConfig.VERSION_NAME;
         //Shared Preference
@@ -139,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    navItemIndex = 5;
+                    navItemIndex = 8;
                     CURRENT_TAG = TAG_PROFILE;
                     loadHomeFragment();
             }
@@ -149,6 +185,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
     private void loadNavHeader() {
 
         Glide.with(this)
@@ -157,12 +195,11 @@ public class MainActivity extends AppCompatActivity {
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .into(imgNavHeaderBg);
 
-        final FirebaseUser user = firebaseAuth.getCurrentUser();
+
         Toast.makeText(MainActivity.this, "Welcome  !!  ", Toast.LENGTH_LONG).show();
         txtName.setText("Welcome,");
 
-        UserID = user.getEmail().replace("@", "").replace(".", "");
-        Firebase mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
+
         mRoofRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -186,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
                         Glide.with(getApplicationContext())
                                 .load(R.drawable.invalid_person_image)
                                 .crossFade()
-                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .into(imgProfile);
                     }
                     else
@@ -196,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
                                 .crossFade()
                                 .thumbnail(0.5f)
                                 .bitmapTransform(new CircleTransform(getApplicationContext()))
-                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .into(imgProfile);
                     }
                 }
@@ -205,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(FirebaseError firebaseError) {   }
         });
-        navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
+        navigationView.getMenu().getItem(6).setActionView(R.layout.menu_dot);
 
 
        // final String version = BuildConfig.VERSION_NAME;
@@ -296,8 +333,7 @@ public class MainActivity extends AppCompatActivity {
                 // update the main content by replacing fragments
                 Fragment fragment = getHomeFragment();
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
-                        android.R.anim.fade_out);
+                fragmentTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
                 fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
                 fragmentTransaction.commitAllowingStateLoss();
             }
@@ -324,19 +360,20 @@ public class MainActivity extends AppCompatActivity {
                 // home
                 return new HomeFragment();
             case 1:
-
                 return new AppointmentFragment();
             case 2:
                 return new PatientFragment();
             case 3:
-                // notifications fragment
-                return new NotificationFragment();
-
+                return new HealthTipsFragment();
             case 4:
-                //ProfileFragment
-                return new ProfileFragment();
-
+                return new PathologyLabsFragment();
             case 5:
+                return new BloodBankFragment();
+            case 6:
+                return new NotificationFragment();
+            case 7:
+                return new ProfileFragment();
+            case 8:
                 //settings fragment
                 return new SettingsFragment();
             default:
@@ -368,24 +405,40 @@ public class MainActivity extends AppCompatActivity {
                         navItemIndex = 0;
                         CURRENT_TAG = TAG_HOME;
                         break;
+
                     case R.id.nav_appointment:
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_APPOINTMENT;
                         break;
+
                     case R.id.nav_patient:
                         navItemIndex = 2;
                         CURRENT_TAG = TAG_PATIENT;
                         break;
-                    case R.id.nav_notifications:
+
+                    case R.id.nav_health:
                         navItemIndex = 3;
+                        CURRENT_TAG = TAG_HEALTH_TIPS;
+                        break;
+                    case R.id.nav_pathology:
+                        navItemIndex = 4;
+                        CURRENT_TAG = TAG_PATHOLOGY_LABS;
+                        break;
+                    case R.id.nav_bloodbank:
+                        navItemIndex = 5;
+                        CURRENT_TAG = TAG_BLOOD_BANKS;
+                        break;
+
+                    case R.id.nav_notifications:
+                        navItemIndex = 6;
                         CURRENT_TAG = TAG_NOTIFICATIONS;
                         break;
                     case R.id.nav_profile:
-                        navItemIndex = 4;
+                        navItemIndex = 7;
                         CURRENT_TAG = TAG_PROFILE;
                         break;
                     case R.id.nav_settings:
-                        navItemIndex = 5;
+                        navItemIndex = 8;
                         CURRENT_TAG = TAG_SETTINGS;
                         break;
 
@@ -470,12 +523,12 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
 
         // show menu only when home fragment is selected
-        if (navItemIndex == 0 || navItemIndex==1 || navItemIndex==2 || navItemIndex==4 || navItemIndex==5) {
+        if (navItemIndex == 0 || navItemIndex==1 || navItemIndex==2 || navItemIndex==3 || navItemIndex==4 || navItemIndex==5 || navItemIndex==7 || navItemIndex==8) {
             getMenuInflater().inflate(R.menu.main, menu);
         }
 
         // when fragment is notifications, load the menu created for notifications
-        if (navItemIndex == 3) {
+        if (navItemIndex == 6) {
             getMenuInflater().inflate(R.menu.notifications, menu);
         }
         return true;

@@ -9,11 +9,26 @@
         <item
             android:id="@+id/nav_appointment"
             android:icon="@drawable/appointment_icon"
-            android:title="@string/nav_photos" />
+            android:title="@string/nav_make_appointment" />
         <item
             android:id="@+id/nav_patient"
             android:icon="@drawable/patient_management"
-            android:title="@string/nav_movies" />
+            android:title="@string/nav_patient_management" />
+
+         <item
+            android:id="@+id/nav_health"
+            android:icon="@drawable/tips_icon"
+            android:title="@string/nav_health" />
+
+         <item
+            android:id="@+id/nav_pathology"
+            android:icon="@drawable/pathology_icon"
+            android:title="@string/nav_patho" />
+
+         <item
+            android:id="@+id/nav_bloodbank"
+            android:icon="@drawable/blood_bank_icon"
+            android:title="@string/nav_blood" />
 
         <item
             android:id="@+id/nav_notifications"

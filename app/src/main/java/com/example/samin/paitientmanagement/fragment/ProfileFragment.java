@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -195,37 +197,7 @@ public class ProfileFragment extends Fragment {
 //                                .placeholder(R.drawable.loading)
 //                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
 //                                .into(user_image);
-//                }
-//                else
-//                {
-//                   // Picasso.with(context).load(R.drawable.invalid_person_image).into(user_image);
-//                    Glide.with(context)
-//                            .load(R.drawable.invalid_person_image)
-//                            .crossFade()
-//                            .diskCacheStrategy(DiskCacheStrategy.RESULT)
-//                            .into(user_image);
 
-//                    if (retrieve_url.equals("Null"))
-//                    {
-//                        Glide.with(context)
-//                                .load(R.drawable.invalid_person_image)
-//                                .crossFade()
-//                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
-//                                .into(user_image);
-//                    }
-//                    else
-//                    {
-////                        Picasso.with(context)
-////                                .load(R.drawable.invalid_person_image)
-////                                .into(user_image);
-////                        Glide.with(v.getContext())
-////                                .load(retrieve_url)
-////                                .crossFade()
-////                                .placeholder(R.drawable.loading)
-////                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
-////                                .into(user_image);
-//                    }
-                //}
             }
 
             @Override
@@ -294,7 +266,7 @@ public class ProfileFragment extends Fragment {
             filePath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Uri downloadUri = taskSnapshot.getDownloadUrl();
+                     Uri downloadUri = taskSnapshot.getDownloadUrl();
                     mRoofRef.child("Image_URL").setValue(downloadUri.toString());
 
                     Glide.with(getContext())

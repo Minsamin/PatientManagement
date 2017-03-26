@@ -226,7 +226,7 @@ public class Show_Appointments extends AppCompatActivity {
                                 .crossFade()
                                 .placeholder(R.drawable.loading)
                                 .thumbnail(0.1f)
-                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .into(post_doctor_image);
                     }
 

@@ -105,9 +105,6 @@ public class AppointmentFragment extends Fragment {
         //Log.d("LOGGED", "IN onStart ");
         mFirebaseAdapter = new FirebaseRecyclerAdapter<DoctorDetails, DoctorDetailsViewHolder>(DoctorDetails.class, R.layout.card_doctor_layout, DoctorDetailsViewHolder.class, myRef) {
 
-
-
-
             public void populateViewHolder(final DoctorDetailsViewHolder viewHolder, DoctorDetails model, final int position) {
                 viewHolder.Doctor_Name(model.getName());
                 viewHolder.Doctor_Email(model.getEmail());
@@ -116,7 +113,7 @@ public class AppointmentFragment extends Fragment {
 
 
                 //OnClick Item
-                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(final View v) {
@@ -185,15 +182,13 @@ public class AppointmentFragment extends Fragment {
     public static class DoctorDetailsViewHolder extends RecyclerView.ViewHolder {
         private final TextView doctor_name, doctor_email, doctor_qualification;
         private final ImageView doctor_image;
-        View mView;
 
         public DoctorDetailsViewHolder(final View itemView) {
             super(itemView);
-            mView = itemView;
-            doctor_name = (TextView) mView.findViewById(R.id.appointment_doctor_name);
-            doctor_email = (TextView) mView.findViewById(R.id.appointment_doctor_email);
-            doctor_image = (ImageView) mView.findViewById(R.id.appointment_doctor_image);
-            doctor_qualification = (TextView) mView.findViewById(R.id.appointment_doctor_spec);
+            doctor_name = (TextView) itemView.findViewById(R.id.appointment_doctor_name);
+            doctor_email = (TextView) itemView.findViewById(R.id.appointment_doctor_email);
+            doctor_image = (ImageView) itemView.findViewById(R.id.appointment_doctor_image);
+            doctor_qualification = (TextView) itemView.findViewById(R.id.appointment_doctor_spec);
 
         }
 
@@ -223,7 +218,7 @@ public class AppointmentFragment extends Fragment {
                         .thumbnail(0.5f)
                         .placeholder(R.drawable.loading)
                         .bitmapTransform(new CircleTransform(itemView.getContext()))
-                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(doctor_image);
            }
 

@@ -54,12 +54,12 @@ public class AboutUsActivity extends AppCompatActivity implements View.OnClickLi
         img_sudipta=(ImageView)findViewById(R.id.about_image_sudipta);
 
         //Social Media - Samin
-        fb_nag = (TextView)findViewById(R.id.tv_facebook_samin);
+        fb_sam = (TextView)findViewById(R.id.tv_facebook_samin);
         g_sam = (TextView)findViewById(R.id.tv_google_plus_samin);
         t_sam = (TextView)findViewById(R.id.tv_twitter_samin);
 
         //Social Media - Nag
-        fb_sam = (TextView)findViewById(R.id.tv_facebook_nag);
+        fb_nag = (TextView)findViewById(R.id.tv_facebook_nag);
         g_nag = (TextView)findViewById(R.id.tv_google_plus_nag);
         t_nag = (TextView)findViewById(R.id.tv_twitter_nag);
 
@@ -112,10 +112,11 @@ public class AboutUsActivity extends AppCompatActivity implements View.OnClickLi
         github.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String git="https://github.com/Minsamin/PatientManagement";
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(git));
-                startActivity(i);
+//                String git="https://github.com/Minsamin/PatientManagement";
+//                Intent i = new Intent(Intent.ACTION_VIEW);
+//                i.setData(Uri.parse(git));
+//                startActivity(i);
+                Toast.makeText(AboutUsActivity.this, "Disabled Link for Security Reason..", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -186,9 +187,6 @@ public class AboutUsActivity extends AppCompatActivity implements View.OnClickLi
 
         //NAG
         if (v.equals(g_nag)) {
-//            Intent i = new Intent(Intent.ACTION_VIEW);
-//            i.setData(Uri.parse("https://plus.google.com/u/0/+SaminAliMondal"));
-//            startActivity(i);
             Toast.makeText(this, "Not Available ! ", Toast.LENGTH_SHORT).show();
             return;
 
@@ -201,9 +199,6 @@ public class AboutUsActivity extends AppCompatActivity implements View.OnClickLi
 
         }
         if (v.equals(t_nag)) {
-//            Intent i = new Intent(Intent.ACTION_VIEW);
-//            i.setData(Uri.parse("https://plus.google.com/u/0/+SaminAliMondal"));
-//            startActivity(i);
             Toast.makeText(this, "Not Available ! ", Toast.LENGTH_SHORT).show();
             return;
 
@@ -250,9 +245,6 @@ public class AboutUsActivity extends AppCompatActivity implements View.OnClickLi
 
         }
         if (v.equals(t_sudipta)) {
-//            Intent i = new Intent(Intent.ACTION_VIEW);
-//            i.setData(Uri.parse("https://plus.google.com/u/0/+SaminAliMondal"));
-//            startActivity(i);
             Toast.makeText(this, "Not Available ! ", Toast.LENGTH_SHORT).show();
 
         }

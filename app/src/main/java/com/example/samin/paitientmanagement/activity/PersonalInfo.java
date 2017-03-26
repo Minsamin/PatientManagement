@@ -33,7 +33,7 @@ public class PersonalInfo extends AppCompatActivity
 {
     private CollapsingToolbarLayout collapsingToolbarLayout = null;
     ImageView imageView;
-    TextView  tx_email,tx_phone,tx_spec,personal_info_text,tv_make_appo;
+    TextView  tx_email,tx_phone,personal_info_text,tv_make_appo;
     String intent_name,intent_phone,intent_email,tx_image;
     Button appointment_button;
     private EditText your_name,your_phone,your_appoint_date,your_appoint_reason;

@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.example.samin.paitientmanagement.R;
@@ -34,6 +35,7 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
     FirebaseUser user;
     public String UserID,email,pass;
     private Firebase mRoofRef,userRef;
+    RadioButton RB_doctor,RB_patient;
 
 
     @Override
@@ -54,8 +56,8 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
         Password = (EditText) findViewById(R.id.etsignup_password);
         signup = (Button) findViewById(R.id.makeappointment_button);
 
-
-
+        RB_doctor = (RadioButton)findViewById(R.id.rb_Doctor);
+        RB_patient = (RadioButton)findViewById(R.id.rb_Patient);
 
         signup.setOnClickListener(this);
     }
@@ -89,6 +91,11 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
         {
             Toast.makeText(this, "Password Should be minimum of 6 character", Toast.LENGTH_SHORT).show();
             //stop the function for Executing further
+            return;
+        }
+        if(!RB_doctor.isChecked() && !RB_patient.isChecked())
+        {
+            Toast.makeText(this, "Select User type ! ", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -173,6 +180,15 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
                             Firebase childRef_image_url = userRef.child("Image_URL");
                             childRef_image_url.setValue("Null");
 
+                            if(RB_doctor.isChecked())
+                            {
+                                userRef.child("User_Type").setValue("Doctor");
+                            }
+                            if(RB_patient.isChecked())
+                            {
+                                userRef.child("User_Type").setValue("Patient");
+                            }
+
                             PGD.dismiss();
 
                             callLogin();
@@ -184,6 +200,8 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
                         }
                     }
                 });
+
+
     }
 
     private void callLogin() {

@@ -52,7 +52,7 @@
             android:fontFamily="sans-serif-condensed"
             android:gravity="center_vertical"
             android:text="Version: Default"
-            android:textColor="@color/Black"
+            android:textColor="#dc1f5b"
             android:textSize="16sp"
             android:textStyle="normal|bold"
             android:typeface="normal" />
@@ -84,7 +84,7 @@
             android:fontFamily="sans-serif-condensed"
             android:gravity="center_vertical"
             android:text="Mail us"
-            android:textColor="@color/Black"
+            android:textColor="#dc1f5b"
             android:textSize="16sp"
             android:textStyle="normal|bold"
             android:typeface="normal" />
@@ -116,7 +116,7 @@
             android:fontFamily="sans-serif-condensed"
             android:gravity="center_vertical"
             android:text="Click here to check GitHub Repo of the Application "
-            android:textColor="@color/Black"
+            android:textColor="#dc1f5b"
             android:textSize="16sp"
             android:textStyle="normal|bold"
             android:typeface="normal" />
