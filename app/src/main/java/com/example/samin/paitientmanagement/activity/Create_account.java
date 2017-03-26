@@ -1,7 +1,9 @@
 package com.example.samin.paitientmanagement.activity;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +22,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.ProviderQueryResult;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 
@@ -27,15 +30,16 @@ import com.google.firebase.storage.FirebaseStorage;
  * Created by Samin on 02-02-2017.
  */
 
-public class Create_account extends AppCompatActivity implements View.OnClickListener{
+public class Create_account extends AppCompatActivity implements View.OnClickListener {
     private EditText Name,Email,Password;
     private Button signup;
     private ProgressDialog PGD;
     private FirebaseAuth firebaseAuth;
     FirebaseUser user;
-    public String UserID,email,pass;
+    public String UserID,email,pass,Designation;
     private Firebase mRoofRef,userRef;
     RadioButton RB_doctor,RB_patient;
+    public static Activity create_Activity;
 
 
     @Override
@@ -44,6 +48,7 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.account_signup);
         firebaseAuth = FirebaseAuth.getInstance();
         PGD = new ProgressDialog(this);
+        create_Activity = this;
 
 
         //FireBase Details
@@ -55,11 +60,24 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
         Email = (EditText) findViewById(R.id.etsignup_email);
         Password = (EditText) findViewById(R.id.etsignup_password);
         signup = (Button) findViewById(R.id.makeappointment_button);
+        Name = (EditText)findViewById(R.id.etsignup_name);
 
         RB_doctor = (RadioButton)findViewById(R.id.rb_Doctor);
         RB_patient = (RadioButton)findViewById(R.id.rb_Patient);
 
+
+//        SharedPreferences sharedPreferences = getSharedPreferences("USER_DESIGNATION", MODE_PRIVATE);
+//        sharedPreferences.getString("USER_TYPE",null);
+
+
+
+
+
         signup.setOnClickListener(this);
+
+
+
+
     }
 
     @Override
@@ -69,6 +87,8 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
             registerUser();
         }
     }
+
+
 
     private void registerUser() {
         email = Email.getText().toString().trim();
@@ -134,7 +154,7 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
 
 
 
-    private void email_validated(String email,String pass)
+    private void email_validated(final String email, String pass)
     {
 
         firebaseAuth.createUserWithEmailAndPassword(email, pass)
@@ -143,10 +163,6 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
 
-                            Toast.makeText(Create_account.this, "Register Successfully. ", Toast.LENGTH_LONG).show();
-
-
-
                             user = firebaseAuth.getCurrentUser();
 
                             UserID=user.getEmail().replace("@","").replace(".","");
@@ -154,40 +170,44 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
                             mRoofRef= new Firebase("https://patient-management-11e26.firebaseio.com/");
                             userRef = mRoofRef.child("User_Details").child(UserID);
 
+                            userRef.child("Name").setValue("Null");
+
+                            userRef.child("Phone").setValue("Null");
+
+                            userRef.child("Address").setValue("Null");
+
+                            userRef.child("Age").setValue("Null");
+
+                             userRef.child("Height").setValue("Null");
+
+                            userRef.child("Weight").setValue("Null");
+
+                            userRef.child("Bloodgroup").setValue("Null");
+
+                            userRef.child("Image_URL").setValue("Null");
 
 
-                            Firebase childRef_name = userRef.child("Name");
-                            childRef_name.setValue("Null");
-
-                            Firebase childRef_phone = userRef.child("Phone");
-                            childRef_phone.setValue("Null");
-
-                            Firebase childRef_address = userRef.child("Address");
-                            childRef_address.setValue("Null");
-
-                            Firebase childRef_age = userRef.child("Age");
-                            childRef_age.setValue("Null");
-
-                            Firebase childRef_height = userRef.child("Height");
-                            childRef_height.setValue("Null");
-
-                            Firebase childRef_weight = userRef.child("Weight");
-                            childRef_weight.setValue("Null");
-
-                            Firebase childRef_bloodgroup = userRef.child("Bloodgroup");
-                            childRef_bloodgroup.setValue("Null");
-
-                            Firebase childRef_image_url = userRef.child("Image_URL");
-                            childRef_image_url.setValue("Null");
 
                             if(RB_doctor.isChecked())
                             {
                                 userRef.child("User_Type").setValue("Doctor");
+                                Designation = "Doctor";
                             }
                             if(RB_patient.isChecked())
                             {
                                 userRef.child("User_Type").setValue("Patient");
+                                Designation = "Patient";
                             }
+
+                            Toast.makeText(Create_account.this, "Register Successfully. ", Toast.LENGTH_LONG).show();
+
+
+                            //userProfile();
+
+//                            SharedPreferences sharedPreferences2 = getSharedPreferences("USER_DESIGNATION", MODE_PRIVATE);
+//                            SharedPreferences.Editor mEditor = sharedPreferences2.edit();
+//                            mEditor.putString("USER_TYPE", Designation);
+//                            mEditor.apply();
 
                             PGD.dismiss();
 
@@ -205,10 +225,37 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
     }
 
     private void callLogin() {
+
         Intent i= new Intent(this,login_activity.class);
         login_activity.login_Activity.finish();
         finish();
-        startActivity(i);
+       startActivity(i);
 
     }
+
+    //Set UserDisplay Name
+//    private void userProfile()
+//    {
+//        FirebaseUser user = firebaseAuth.getCurrentUser();
+//        if(user!= null)
+//        {
+//            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+//                    .setDisplayName(Name.getText().toString().trim().concat("_").concat(Designation))
+//                    //.setPhotoUri(Uri.parse("https://example.com/jane-q-user/profile.jpg"))  // here you can set image link also.
+//                    .build();
+//
+//            user.updateProfile(profileUpdates)
+//                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<Void> task) {
+//                            if (task.isSuccessful()) {
+//                                //Log.d("TESTING", "User profile updated.");
+//                            }
+//                        }
+//                    });
+//        }
+//
+//    }
+
+
 }

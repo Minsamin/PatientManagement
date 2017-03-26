@@ -30,7 +30,7 @@ import com.google.firebase.auth.ProviderQueryResult;
 
 public class login_activity  extends AppCompatActivity implements View.OnClickListener{
 
-    private EditText et_email, et_pass;
+    public EditText et_email, et_pass;
     private Button loginButton,signup_button, forget_password_button;
     private ProgressDialog PGD;
     private FirebaseAuth firebaseAuth;
@@ -45,8 +45,8 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_layout);
 
+
         //Static variable to finish this Activity on Sign up Complete
-        login_Activity = this;
 
         PGD = new ProgressDialog(this);
         firebaseAuth = FirebaseAuth.getInstance();
@@ -57,6 +57,9 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
             finish();
             startActivity(new Intent(getApplicationContext(),MainActivity.class));
         }
+
+        login_Activity = this;
+
 
         et_email = (EditText) findViewById(R.id.input_Email);
         et_pass =(EditText) findViewById(R.id.input_Password);
@@ -79,6 +82,7 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
         Typeface type = Typeface.createFromAsset(getAssets(),"fonts/RobotoCondensed-Bold.ttf");
         et_email.setTypeface(type);
         et_pass.setTypeface(type);
+
     }
 
     @Override
@@ -234,6 +238,7 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
                         PGD.dismiss();
                         if (task.isSuccessful()) {
                             finish();
+                            //Create_account.create_Activity.finish();
                             PGD.dismiss();
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
@@ -265,6 +270,10 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
         super.onBackPressed();
     }
 
-
-
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        String s = getIntent().getStringExtra("Current_Email");
+//        et_email.setText(s);
+//    }
 }

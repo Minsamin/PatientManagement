@@ -46,6 +46,7 @@ import com.firebase.client.ValueEventListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.FirebaseDatabase;
 import com.onesignal.OneSignal;
 
 import java.io.OutputStream;
@@ -91,8 +92,6 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog.Builder builder;
     String check;
     String version;
-    //static public String user_designation;
-
 
 
     @Override
@@ -107,27 +106,84 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(getApplicationContext(),login_activity.class));
         }
 
+        SharedPreferences sharedPreferences2 = getSharedPreferences("USER_DESIGNATION", MODE_PRIVATE);
+        String user_type = sharedPreferences2.getString("USER_TYPE",null);
+
 
         user = firebaseAuth.getCurrentUser();
         UserID = user.getEmail().replace("@", "").replace(".", "");
 
+
+        //Set User's TAG
         LoggedIn_User_Email = user.getEmail();
-
-
         OneSignal.sendTag("User_ID", LoggedIn_User_Email);
+        View navHeader;
 
-
-
-        mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
-//        if(UserID.equals("saminali500gmailcom"))
-//            user_designation ="Doctor";
-
-
-            setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
+
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        // fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        // Navigation view header
+        navHeader = navigationView.getHeaderView(0);
+        txtName = (TextView) navHeader.findViewById(R.id.name);
+        txtWebsite = (TextView) navHeader.findViewById(R.id.website);
+        imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
+        imgProfile = (ImageView) navHeader.findViewById(R.id.navBar_profile_image);
+
+        // load toolbar titles from string resources
+        activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
+
+
+        mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
+
+
+        mRoofRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, String> map = dataSnapshot.getValue(Map.class);
+                String retrieve_type = map.get("User_Type");
+                if(retrieve_type.equals("Doctor"))
+                {
+                    Toast.makeText(MainActivity.this, "I AM A DOCTOR", Toast.LENGTH_SHORT).show();
+                    Log.d("LOGGED", "I AM A DOCTOR: ");
+
+                    Toast.makeText(MainActivity.this, "Hello Doctor " + UserID, Toast.LENGTH_SHORT).show();
+
+
+                    navigationView.getMenu().getItem(1).setVisible(false);
+
+                    // load nav menu header data
+                    loadNavHeader();
+
+                    // initializing navigation menu
+                    setUpNavigationView_doctor();
+
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this, "I AM A PATIENT", Toast.LENGTH_SHORT).show();
+                    Log.d("LOGGED", "I AM A PATIENT: ");
+                    Toast.makeText(MainActivity.this, "Hello Patient " + UserID, Toast.LENGTH_SHORT).show();
+
+                    // load nav menu header data
+                    loadNavHeader();
+
+                    // initializing navigation menu
+                    setUpNavigationView();
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
 
 
         version = BuildConfig.VERSION_NAME;
@@ -139,30 +195,46 @@ public class MainActivity extends AppCompatActivity {
          */
         SharedPreferences sharedPreferences = getSharedPreferences("Update", MODE_PRIVATE);
         check =sharedPreferences.getString("update_later",version);
-        Log.d("LOGGED", " 1st Check value 4m Shared : " +check);
+
+
+
+        //Log.d("LOGGED", " 1st Check value 4m Shared : " +check);
+
+//
+//        if (user_type != null) {
+//            Log.d("LOGGED", "I ALREADY EXECUTED ");
+//            switch (user_type) {
+//                case "Doctor":
+//                    Toast.makeText(MainActivity.this, "Hello Doctor " + UserID, Toast.LENGTH_SHORT).show();
+//
+////
+////                    navigationView.getMenu().getItem(1).setVisible(false);
+////
+////                    // load nav menu header data
+////                    loadNavHeader();
+////
+////                    // initializing navigation menu
+////                    setUpNavigationView_doctor();
+//                    break;
+//
+//
+//                case "Patient":
+//                    Toast.makeText(MainActivity.this, "Hello Patient " + UserID, Toast.LENGTH_SHORT).show();
+//
+////                    // load nav menu header data
+////                    loadNavHeader();
+////
+////                    // initializing navigation menu
+////                    setUpNavigationView();
+//                    break;
+//
+//            }
+//        }
 
         //Async Task
         mHandler = new Handler();
+        Log.d("LOGGED", "I waited ");
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-       // fab = (FloatingActionButton) findViewById(R.id.fab);
-
-        // Navigation view header
-        View navHeader = navigationView.getHeaderView(0);
-        txtName = (TextView) navHeader.findViewById(R.id.name);
-        txtWebsite = (TextView) navHeader.findViewById(R.id.website);
-        imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
-        imgProfile = (ImageView) navHeader.findViewById(R.id.navBar_profile_image);
-
-        // load toolbar titles from string resources
-        activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
-
-        // load nav menu header data
-        loadNavHeader();
-
-        // initializing navigation menu
-        setUpNavigationView();
 
         if (savedInstanceState == null) {
             navItemIndex = 0;
@@ -171,15 +243,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    navItemIndex = 8;
-                    CURRENT_TAG = TAG_PROFILE;
-                    loadHomeFragment();
+                navItemIndex = 7;
+                CURRENT_TAG = TAG_PROFILE;
+                loadHomeFragment();
             }
         });
+
 
 
 
@@ -242,6 +314,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(FirebaseError firebaseError) {   }
         });
+
+
         navigationView.getMenu().getItem(6).setActionView(R.layout.menu_dot);
 
 
@@ -276,10 +350,12 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Toast.makeText(MainActivity.this, "Check Settings to Update.", Toast.LENGTH_LONG).show();
+
                                     SharedPreferences sharedPreferences = getSharedPreferences("Update", MODE_PRIVATE);
                                     SharedPreferences.Editor mEditor = sharedPreferences.edit();
                                     mEditor.putString("update_later", retrieve_version);
                                     mEditor.apply();
+
                                     //Log.d("LOGGED", "Updated value " +retrieve_version);
                                     dialog.cancel();
                                 }
@@ -308,6 +384,7 @@ public class MainActivity extends AppCompatActivity {
     private void loadHomeFragment() {
         // selecting appropriate nav menu item
         selectNavMenu();
+
 
         // set toolbar title
         setToolbarTitle();
@@ -471,6 +548,112 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer) {
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                // Code here will be triggered once the drawer closes as we dont want anything to happen so we leave this blank
+                super.onDrawerClosed(drawerView);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
+                super.onDrawerOpened(drawerView);
+            }
+        };
+
+        //Setting the actionbarToggle to drawer layout
+        drawer.setDrawerListener(actionBarDrawerToggle);
+
+        //calling sync state is necessary or else your hamburger icon wont show up
+        actionBarDrawerToggle.syncState();
+    }
+
+
+
+
+    private void setUpNavigationView_doctor() {
+        //Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+
+            // This method will trigger on item Click of navigation menu
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+
+                //Check to see which item was being clicked and perform appropriate action
+                switch (menuItem.getItemId()) {
+                    //Replacing the main content with ContentFragment Which is our Inbox View;
+
+                    case R.id.nav_home:
+                        navItemIndex = 0;
+                        CURRENT_TAG = TAG_HOME;
+                        break;
+
+//                    case R.id.nav_appointment:
+//                        navItemIndex = 1;
+//                        CURRENT_TAG = TAG_APPOINTMENT;
+//                        break;
+
+                    case R.id.nav_patient:
+                        navItemIndex = 2;
+                        CURRENT_TAG = TAG_PATIENT;
+                        break;
+
+                    case R.id.nav_health:
+                        navItemIndex = 3;
+                        CURRENT_TAG = TAG_HEALTH_TIPS;
+                        break;
+                    case R.id.nav_pathology:
+                        navItemIndex = 4;
+                        CURRENT_TAG = TAG_PATHOLOGY_LABS;
+                        break;
+                    case R.id.nav_bloodbank:
+                        navItemIndex = 5;
+                        CURRENT_TAG = TAG_BLOOD_BANKS;
+                        break;
+
+                    case R.id.nav_notifications:
+                        navItemIndex = 6;
+                        CURRENT_TAG = TAG_NOTIFICATIONS;
+                        break;
+                    case R.id.nav_profile:
+                        navItemIndex = 7;
+                        CURRENT_TAG = TAG_PROFILE;
+                        break;
+                    case R.id.nav_settings:
+                        navItemIndex = 8;
+                        CURRENT_TAG = TAG_SETTINGS;
+                        break;
+
+
+                    case R.id.nav_about_us:
+                        // launch new intent instead of loading fragment
+                        startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
+                        drawer.closeDrawers();
+                        return true;
+                    case R.id.nav_privacy_policy:
+                        // launch new intent instead of loading fragment
+                        startActivity(new Intent(MainActivity.this, PrivacyPolicyActivity.class));
+                        drawer.closeDrawers();
+                        return true;
+                    default:
+                        navItemIndex = 0;
+                }
+
+                //Checking if the item is in checked state or not, if not make it in checked state
+                if (menuItem.isChecked()) {
+                    menuItem.setChecked(false);
+                } else {
+                    menuItem.setChecked(true);
+                }
+                menuItem.setChecked(true);
+
+                loadHomeFragment();
+
+                return true;
+            }
+        });
 
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer) {
 
@@ -493,6 +676,15 @@ public class MainActivity extends AppCompatActivity {
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
     }
+
+
+
+
+
+
+
+
+
 
     @Override
     public void onBackPressed() {
