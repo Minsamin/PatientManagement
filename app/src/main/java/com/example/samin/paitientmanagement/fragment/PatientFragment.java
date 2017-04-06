@@ -24,7 +24,7 @@ public class PatientFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.ctx=ctx;
+        this.ctx=getContext();
     }
 
     @Override

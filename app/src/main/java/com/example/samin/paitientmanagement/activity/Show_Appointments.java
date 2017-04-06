@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.samin.paitientmanagement.R;
+import com.example.samin.paitientmanagement.fragment.PathologyLabsFragment;
 import com.example.samin.paitientmanagement.other.Show_appointment_data_item;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -39,11 +40,11 @@ public class Show_Appointments extends AppCompatActivity {
 
     public FirebaseAuth firebaseAuth;
     public String UserID;
-    DatabaseReference myRef;
+    DatabaseReference myRef,myRef2;
 
     private RecyclerView recyclerView;
     private FirebaseRecyclerAdapter<Show_appointment_data_item, MyViewHolder> mFirebaseAdapter;
-    Boolean flag=false;
+    //Boolean flag=false;
 
 
     @Override
@@ -65,8 +66,16 @@ public class Show_Appointments extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser user = firebaseAuth.getCurrentUser();
         //Log.d("LOGGED ", " USER " + user.toString());
+
+//        if(MainActivity.app_user_type=="Patient")
+//        {}
+//        if(MainActivity.LoggedIn_User_Email=="")
+//        {}
+
+
         UserID = user.getEmail().replace("@", "").replace(".", "");
         myRef = FirebaseDatabase.getInstance().getReference("User_Appointment").child(UserID);
+        myRef2 = FirebaseDatabase.getInstance().getReference("Doctor_Appointment").child(MainActivity.LoggedIn_User_Email.replace("@", "").replace(".", ""));
 
         //Recycler View
         recyclerView = (RecyclerView) findViewById(R.id.show_appointment_recycler_view);
@@ -79,9 +88,12 @@ public class Show_Appointments extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-       // Log.d("LOGGED", "IN onStart ");
-        mFirebaseAdapter = new FirebaseRecyclerAdapter<Show_appointment_data_item, MyViewHolder>(Show_appointment_data_item.class, R.layout.show_appointment_single_item, MyViewHolder.class, myRef) {
-            //            @Override
+        // Log.d("LOGGED", "IN onStart ");
+
+        if (MainActivity.app_user_type.equals("Patient"))
+        {
+            mFirebaseAdapter = new FirebaseRecyclerAdapter<Show_appointment_data_item, MyViewHolder>(Show_appointment_data_item.class, R.layout.show_appointment_single_item, MyViewHolder.class, myRef) {
+                //            @Override
 //            public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 //                Log.d("LOGGED", " onStart-Called 4m inside " );
 //
@@ -90,46 +102,135 @@ public class Show_Appointments extends AppCompatActivity {
 //                                .inflate(R.layout.show_appointment_single_item, parent, false);
 //                return super.onCreateViewHolder(view, viewType);
 //            }
-            public void populateViewHolder(final MyViewHolder viewHolder, Show_appointment_data_item model, final int position) {
-                flag=true;
-                viewHolder.setDoctor_URL(model.getAppointment_Doctor_Email());
-                viewHolder.setAppointment_Doctor_Name(model.getAppointment_Doctor_Name());
-                viewHolder.setAppointment_Doctor_Email(model.getAppointment_Doctor_Email());
-                viewHolder.setAppointment_Doctor_Phone(model.getAppointment_Doctor_phone());
-                viewHolder.setAppointment_Patient_Name(model.getPatient_Name());
-                viewHolder.setAppointment_Patient_Phone(model.getPatient_Phone());
-                viewHolder.setAppointment_Date(model.getAppointment_Date());
-                viewHolder.setAppointment_Reason(model.getAppointment_Reason());
-                //Log.d("LOGGED", "populateViewHolder: Called ");
-                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                public void populateViewHolder(final MyViewHolder viewHolder, Show_appointment_data_item model, final int position) {
+                    //flag = true;
 
-                    @Override
-                    public void onClick(final View v) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(Show_Appointments.this);
-                        builder.setMessage("Do you want to Delete the Appointment ?").setCancelable(false)
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        int selectedItems = position;
-                                        mFirebaseAdapter.getRef(selectedItems).removeValue();
-                                        mFirebaseAdapter.notifyItemRemoved(selectedItems);
-                                        recyclerView.invalidate();
-                                        onStart();
-                                    }
-                                })
-                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.cancel();
-                                    }
-                                });
-                        AlertDialog dialog = builder.create();
-                        dialog.setTitle("Confirm");
-                        dialog.show();
-                    }
-                });
-            }
-        };
+
+                    //if(MainActivity.app_user_type.equals("Patient")) {
+                    viewHolder.setDoctor_URL(model.getAppointment_Doctor_Email());
+                    viewHolder.setAppointment_Doctor_Name(model.getAppointment_Doctor_Name());
+                    viewHolder.setAppointment_Doctor_Email(model.getAppointment_Doctor_Email());
+                    viewHolder.setAppointment_Doctor_Phone(model.getAppointment_Doctor_phone());
+                    viewHolder.setAppointment_Patient_Name(model.getPatient_Name());
+                    viewHolder.setAppointment_Patient_Phone(model.getPatient_Phone());
+                    viewHolder.setAppointment_Date(model.getAppointment_Date());
+                    viewHolder.setAppointment_Reason(model.getAppointment_Reason());
+
+                    //}
+
+//                else if (MainActivity.app_user_type.equals("Doctor"))
+//                {
+//                    String my_Appointment = model.getAppointment_Doctor_Email();
+//                    if(my_Appointment.equals(MainActivity.LoggedIn_User_Email))
+//                    {
+//
+//                    }
+//
+//                }
+                    //Log.d("LOGGED", "populateViewHolder: Called ");
+                    viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(final View v) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(Show_Appointments.this);
+                            builder.setMessage("Do you want to Delete the Appointment ?").setCancelable(false)
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            int selectedItems = position;
+                                            mFirebaseAdapter.getRef(selectedItems).removeValue();
+                                            mFirebaseAdapter.notifyItemRemoved(selectedItems);
+                                            recyclerView.invalidate();
+                                            onStart();
+                                        }
+                                    })
+                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                            AlertDialog dialog = builder.create();
+                            dialog.setTitle("Confirm");
+                            dialog.show();
+                        }
+                    });
+
+
+                }
+            };
+    }
+
+        else if (MainActivity.app_user_type.equals("Doctor"))
+        {
+            mFirebaseAdapter = new FirebaseRecyclerAdapter<Show_appointment_data_item, MyViewHolder>(Show_appointment_data_item.class, R.layout.show_appointment_single_item, MyViewHolder.class, myRef2) {
+                //            @Override
+//            public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+//                Log.d("LOGGED", " onStart-Called 4m inside " );
+//
+//                ViewGroup view = (ViewGroup)
+//                        LayoutInflater.from(parent.getContext())
+//                                .inflate(R.layout.show_appointment_single_item, parent, false);
+//                return super.onCreateViewHolder(view, viewType);
+//            }
+                public void populateViewHolder(final MyViewHolder viewHolder, Show_appointment_data_item model, final int position) {
+                    //flag = true;
+
+
+                    //if(MainActivity.app_user_type.equals("Patient")) {
+                    viewHolder.setDoctor_URL(model.getAppointment_Doctor_Email());
+                    //viewHolder.setAppointment_Doctor_Name(model.getAppointment_Doctor_Name());
+                    viewHolder.setAppointment_Doctor_Email(model.getAppointment_Doctor_Email());
+                    //viewHolder.setAppointment_Doctor_Phone(model.getAppointment_Doctor_phone());
+                    viewHolder.setAppointment_Patient_Name(model.getPatient_Name());
+                    viewHolder.setAppointment_Patient_Phone(model.getPatient_Phone());
+                    viewHolder.setAppointment_Date(model.getAppointment_Date());
+                    viewHolder.setAppointment_Reason(model.getAppointment_Reason());
+
+                    //}
+
+//                else if (MainActivity.app_user_type.equals("Doctor"))
+//                {
+//                    String my_Appointment = model.getAppointment_Doctor_Email();
+//                    if(my_Appointment.equals(MainActivity.LoggedIn_User_Email))
+//                    {
+//
+//                    }
+//
+//                }
+                    //Log.d("LOGGED", "populateViewHolder: Called ");
+                    viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(final View v) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(Show_Appointments.this);
+                            builder.setMessage("Do you want to Delete the Appointment ?").setCancelable(false)
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            int selectedItems = position;
+                                            mFirebaseAdapter.getRef(selectedItems).removeValue();
+                                            mFirebaseAdapter.notifyItemRemoved(selectedItems);
+                                            recyclerView.invalidate();
+                                            onStart();
+                                        }
+                                    })
+                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                            AlertDialog dialog = builder.create();
+                            dialog.setTitle("Confirm");
+                            dialog.show();
+                        }
+                    });
+
+
+                }
+            };
+        }
 
         //Log.d("LOGGED", "Setting Adapter ");
         recyclerView.setAdapter(mFirebaseAdapter);
@@ -181,14 +282,17 @@ public class Show_Appointments extends AppCompatActivity {
 
         private void setAppointment_Doctor_Name(String title) {
             post_doctor_name.setText(title);
+            Log.d("LOGGED", "Doctor_Name: " + title);
         }
 
         private void setAppointment_Doctor_Phone(String title) {
             post_doctor_phone.setText(title);
+
         }
 
         private void setAppointment_Doctor_Email(String title) {
             post_doctor_email.setText(title);
+            Log.d("LOGGED", "Doctor_Email: " + title);
         }
 
         private void setAppointment_Patient_Name(String title) {
@@ -216,7 +320,7 @@ public class Show_Appointments extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Map<String, String> map = dataSnapshot.getValue(Map.class);
-                        String retrieve_url = map.get("Image_Url");
+                        String retrieve_url = map.get("Image_URL");
 //                        Picasso.with(itemView.getContext())
 //                                .load(retrieve_url)
 //                                .placeholder(R.drawable.loading)

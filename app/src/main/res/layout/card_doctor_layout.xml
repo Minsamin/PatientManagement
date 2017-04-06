@@ -20,7 +20,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="1dp">
+            android:padding="0.5dp">
 
 
             <ImageView
@@ -34,43 +34,56 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_marginLeft="20dp"
-                android:layout_toRightOf="@+id/appointment_doctor_image"
+                android:layout_marginStart="20dp"
+                android:layout_toEndOf="@+id/appointment_doctor_image"
                 android:text="Demo1"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-            <ImageView
-                android:id="@+id/break_image"
-                android:layout_toRightOf="@+id/appointment_doctor_image"
-                android:layout_width="match_parent"
-                android:layout_marginLeft="-15dp"
-                android:layout_marginTop="-6dp"
-                android:layout_below="@+id/appointment_doctor_name"
-                android:layout_height="wrap_content"
-                android:src="@drawable/break_line" />
+            <!--<ImageView-->
+                <!--android:id="@+id/break_image"-->
+                <!--android:layout_toEndOf="@+id/appointment_doctor_image"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_marginStart="-15dp"-->
+                <!--android:layout_marginTop="-6dp"-->
+                <!--android:layout_below="@+id/appointment_doctor_name"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:src="@drawable/break_line" />-->
 
-            <TextView
-                android:id="@+id/appointment_doctor_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/appointment_doctor_name"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="17dp"
-                android:layout_toRightOf="@+id/appointment_doctor_image"
-                android:text="Email Address"
-                android:textSize="17sp" />
+            <View
+                android:id="@+id/break_image"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginStart="20dp"
+                android:background="#7c87d1"
+                android:layout_below="@+id/appointment_doctor_name"
+                android:layout_toEndOf="@+id/appointment_doctor_image"/>
 
             <TextView
                 android:id="@+id/appointment_doctor_spec"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/appointment_doctor_email"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="2dp"
-                android:layout_toRightOf="@+id/appointment_doctor_image"
+                android:layout_below="@+id/appointment_doctor_name"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_toEndOf="@+id/appointment_doctor_image"
                 android:text="Specialisation"
-                android:textSize="17sp"
-                 />
+                android:textSize="14sp"
+                />
+
+
+            <TextView
+                android:id="@+id/appointment_doctor_chamber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/appointment_doctor_spec"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="2dp"
+                android:layout_toEndOf="@+id/appointment_doctor_image"
+                android:text="Chamber"
+                android:textSize="12sp" />
+
+
 
 
         </RelativeLayout>

@@ -33,7 +33,7 @@ public class PersonalInfo extends AppCompatActivity
 {
     private CollapsingToolbarLayout collapsingToolbarLayout = null;
     ImageView imageView;
-    TextView  tx_email,tx_phone,personal_info_text,tv_make_appo;
+    TextView  tx_email,tx_phone,personal_info_text,tv_make_appo,tx_specialization,tx_chamber,tx_experience,tx_fees,tx_timing;
     String intent_name,intent_phone,intent_email,tx_image;
     Button appointment_button;
     private EditText your_name,your_phone,your_appoint_date,your_appoint_reason;
@@ -68,15 +68,30 @@ public class PersonalInfo extends AppCompatActivity
 
         //imageView.setImageResource(getIntent().getIntExtra("image_id",00));
 
-        tx_email =(TextView)findViewById(R.id.d_doctor_email);
-        tx_phone=(TextView)findViewById(R.id.d_doctor_phone);
-        tx_email.setText("Email : "+getIntent().getStringExtra("email"));
-        tx_phone.setText("Phone : "+getIntent().getStringExtra("phone"));
+        tx_email =(TextView)findViewById(R.id.d_doctor_email2);
+        tx_phone=(TextView)findViewById(R.id.d_doctor_phone2);
+        tx_chamber=(TextView)findViewById(R.id.d_doctor_chamber2);
+        tx_experience=(TextView)findViewById(R.id.d_doctor_experience2);
+        tx_specialization=(TextView)findViewById(R.id.d_doctor_specialization2);
+        tx_timing=(TextView)findViewById(R.id.d_doctor_timing2);
+        tx_fees=(TextView)findViewById(R.id.d_doctor_fees2);
+
+        //tx_email.setText("Email : "+getIntent().getStringExtra("email"));
+        tx_email.setText(getIntent().getStringExtra("email"));
+
+
+        tx_phone.setText(getIntent().getStringExtra("phone"));
+        tx_chamber.setText(getIntent().getStringExtra("chamber"));
+        tx_experience.setText(getIntent().getStringExtra("experience").concat(" Years"));
+        tx_specialization.setText(getIntent().getStringExtra("specialization"));
+        tx_timing.setText(getIntent().getStringExtra("timing").replace(",","\n"));
+        tx_fees.setText(getIntent().getStringExtra("fees"));
+
 
         //Fetch Intent data for appointment Field
         intent_name = getIntent().getStringExtra("name");
-        intent_phone = getIntent().getStringExtra("email");
-        intent_email = getIntent().getStringExtra("phone");
+        intent_phone = getIntent().getStringExtra("phone");
+        intent_email = getIntent().getStringExtra("email");
         tx_image = getIntent().getStringExtra("image_id");
        // imageView.setImageURI(Uri.parse(tx_image));
 //        Picasso.with(getApplicationContext())
@@ -91,10 +106,17 @@ public class PersonalInfo extends AppCompatActivity
                 .into(imageView);
 
 
-        Typeface txt =Typeface.createFromAsset(getAssets(),"fonts/RobotoCondensed-LightItalic.ttf");
+        Typeface txt =Typeface.createFromAsset(getAssets(),"fonts/Roboto-LightItalic.ttf");
         Typeface txt2 =Typeface.createFromAsset(getAssets(),"fonts/RobotoCondensed-BoldItalic.ttf");
+
         tx_email.setTypeface(txt);
         tx_phone.setTypeface(txt);
+        tx_specialization.setTypeface(txt);
+        tx_experience.setTypeface(txt);
+        tx_chamber.setTypeface(txt);
+        tx_timing.setTypeface(txt);
+        tx_fees.setTypeface(txt);
+
         personal_info_text.setTypeface(txt2);
         tv_make_appo.setTypeface(txt2);
 
@@ -171,11 +193,24 @@ public class PersonalInfo extends AppCompatActivity
         userRef.child("Appointment_Date").setValue(getDate);
         userRef.child("Appointment_Reason").setValue(getReason);
         userRef.child("Appointment_Doctor_Name").setValue(intent_name.trim());
-        userRef.child("Appointment_Doctor_Email").setValue(intent_phone.trim());
-        userRef.child("Appointment_Doctor_phone").setValue(intent_email.trim());
+        userRef.child("Appointment_Doctor_Email").setValue(intent_email.trim());
+        userRef.child("Appointment_Doctor_phone").setValue(intent_phone.trim());
         userRef.child("Creation_Time").setValue(current_time_format.format( new Date()));
         userRef.child("Creation_Date").setValue(current_date_format.format( new Date()));
         userRef.child("Request_Status").setValue("Pending");
+
+        Firebase mRoofRef2 = new Firebase("https://patient-management-11e26.firebaseio.com/");
+        Firebase userRef2 = mRoofRef2.child("Doctor_Appointment").child(intent_email.trim().replace("@","").replace(".","")).push();
+        userRef2.child("Patient_Name").setValue(getName);
+        userRef2.child("Patient_Phone").setValue(getPhone);
+        userRef2.child("Appointment_Date").setValue(getDate);
+        userRef2.child("Appointment_Reason").setValue(getReason);
+//        userRef2.child("Appointment_Doctor_Name").setValue(intent_name.trim());
+        userRef2.child("Appointment_Doctor_Email").setValue(intent_email.trim());
+//        userRef2.child("Appointment_Doctor_phone").setValue(intent_email.trim());
+        userRef2.child("Creation_Time").setValue(current_time_format.format( new Date()));
+        userRef2.child("Creation_Date").setValue(current_date_format.format( new Date()));
+        userRef2.child("Request_Status").setValue("Pending");
         Toast.makeText(this, "Appointment Registered", Toast.LENGTH_SHORT).show();
 
         your_name.setText("");

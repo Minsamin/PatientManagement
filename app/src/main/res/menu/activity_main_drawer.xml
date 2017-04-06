@@ -14,6 +14,10 @@
             android:id="@+id/nav_patient"
             android:icon="@drawable/patient_management"
             android:title="@string/nav_patient_management" />
+        <item
+            android:id="@+id/nav_patient2"
+            android:icon="@drawable/patient_management"
+            android:title="@string/nav_patient_management2" />
 
          <item
             android:id="@+id/nav_health"

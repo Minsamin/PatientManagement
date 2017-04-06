@@ -74,10 +74,10 @@ public class HomeFragment extends Fragment {
                             .permitAll().build();
                     StrictMode.setThreadPolicy(policy);
                     String send_email;
-                    if (MainActivity.LoggedIn_User_Email.equals("saminali500@gmail.com")) {
-                        send_email = "admin@gmail.com";
+                    if (MainActivity.LoggedIn_User_Email.equals("user3@gmail.com")) {
+                        send_email = "doctor3@gmail.com";
                     } else {
-                        send_email = "saminali500@gmail.com";
+                        send_email = "user3@gmail.com";
                     }
 
                     try {

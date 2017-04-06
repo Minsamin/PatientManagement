@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.samin.paitientmanagement.R;
+import com.example.samin.paitientmanagement.activity.MainActivity;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -74,111 +76,121 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        final View v = inflater.inflate(R.layout.fragment_profile, container, false);
+        final View v;
 
-        user_name = (EditText) v.findViewById(R.id.profile_edit_name);
-        user_phone = (EditText) v.findViewById(R.id.profile_edit_phone);
-        user_address = (EditText) v.findViewById(R.id.profile_edit_address);
-        user_age = (EditText) v.findViewById(R.id.profile_edit_age);
-        user_height = (EditText) v.findViewById(R.id.profile_edit_height);
-        user_weight = (EditText) v.findViewById(R.id.profile_edit_weight);
-        user_bloodgroup = (EditText) v.findViewById(R.id.profile_edit_bloodgroup);
+//        if(MainActivity.app_user_type.equals("Doctor"))
+//        {
+//             v = inflater.inflate(R.layout.fragment_profile_doctor, container, false);
+//        }
+//        else
+//        {
+//             v = inflater.inflate(R.layout.fragment_profile, container, false);
+//        }
 
-        user_image = (ImageView) v.findViewById(R.id.profile_edit_image);
-        change_image = (ImageView) v.findViewById(R.id.change_user_image);
+            // Inflate the layout for this fragment
+        v = inflater.inflate(R.layout.fragment_profile, container, false);
+
+            user_name = (EditText) v.findViewById(R.id.profile_edit_name);
+            user_phone = (EditText) v.findViewById(R.id.profile_edit_phone);
+            user_address = (EditText) v.findViewById(R.id.profile_edit_address);
+            user_age = (EditText) v.findViewById(R.id.profile_edit_age);
+            user_height = (EditText) v.findViewById(R.id.profile_edit_height);
+            user_weight = (EditText) v.findViewById(R.id.profile_edit_weight);
+            user_bloodgroup = (EditText) v.findViewById(R.id.profile_edit_bloodgroup);
+
+            user_image = (ImageView) v.findViewById(R.id.profile_edit_image);
+            change_image = (ImageView) v.findViewById(R.id.change_user_image);
 
 
-        //For image
-        mProgressDialog = new ProgressDialog(getContext());
+            //For image
+            mProgressDialog = new ProgressDialog(getContext());
 
-        // change_image.setOnClickListener(this);
-        change_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            // change_image.setOnClickListener(this);
+            change_image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                // if(checkS){}
+                    // if(checkS){}
 
-                if (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getContext(), "Call for Permission", Toast.LENGTH_SHORT).show();
-                    requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
-                } else {
+                    if (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(getContext(), "Call for Permission", Toast.LENGTH_SHORT).show();
+                        requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
+                    } else {
 
-                    callgalary();
+                        callgalary();
+                    }
                 }
-            }
-        });
+            });
 
-        user_save_button = (Button) v.findViewById(R.id.profile_save_button);
-        mdatabaseRef = FirebaseDatabase.getInstance().getReference();
+            user_save_button = (Button) v.findViewById(R.id.profile_save_button);
+            mdatabaseRef = FirebaseDatabase.getInstance().getReference();
 
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-        UserID = user.getEmail().replace("@", "").replace(".", "");
-        mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
-        mStorage = FirebaseStorage.getInstance().getReferenceFromUrl("gs://patient-management-11e26.appspot.com/");
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            UserID = user.getEmail().replace("@", "").replace(".", "");
+            mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
+            mStorage = FirebaseStorage.getInstance().getReferenceFromUrl("gs://patient-management-11e26.appspot.com/");
 
-        mRoofRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            mRoofRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                Map<String, String> map = dataSnapshot.getValue(Map.class);
+                    Map<String, String> map = dataSnapshot.getValue(Map.class);
 
-                String retrieve_name = map.get("Name");
-                String retrieve_phone = map.get("Phone");
-                String retrieve_address = map.get("Address");
-                String retrieve_age = map.get("Age");
-                String retrieve_height = map.get("Height");
-                String retrieve_weight = map.get("Weight");
-                String retrieve_bloodgroup = map.get("Bloodgroup");
-                String retrieve_url = map.get("Image_URL");
+                    String retrieve_name = map.get("Name");
+                    String retrieve_phone = map.get("Phone");
+                    String retrieve_address = map.get("Address");
+                    String retrieve_age = map.get("Age");
+                    String retrieve_height = map.get("Height");
+                    String retrieve_weight = map.get("Weight");
+                    String retrieve_bloodgroup = map.get("Bloodgroup");
+                    String retrieve_url = map.get("Image_URL");
 
-                Log.d("LOGGED", "onDataChange: v.context " + v.getContext());
+                    Log.d("LOGGED", "onDataChange: v.context " + v.getContext());
 
-                if (retrieve_name.matches("Null"))
-                    user_name.setText("");
-                else
-                    user_name.setText(retrieve_name);
-
+                    if (retrieve_name.matches("Null"))
+                        user_name.setText("");
+                    else
+                        user_name.setText(retrieve_name);
 
 
-                if (retrieve_phone.matches("Null"))
-                    user_phone.setText("");
-                else
-                    user_phone.setText(retrieve_phone);
+                    if (retrieve_phone.matches("Null"))
+                        user_phone.setText("");
+                    else
+                        user_phone.setText(retrieve_phone);
 
 
-                if (retrieve_address.matches("Null"))
-                    user_address.setText("");
-                else
-                    user_address.setText(retrieve_address);
+                    if (retrieve_address.matches("Null"))
+                        user_address.setText("");
+                    else
+                        user_address.setText(retrieve_address);
 
 
-                if (retrieve_age.matches("Null"))
-                    user_age.setText("");
-                else
-                    user_age.setText(retrieve_age);
+                    if (retrieve_age.matches("Null"))
+                        user_age.setText("");
+                    else
+                        user_age.setText(retrieve_age);
 
 
-                if (retrieve_height.matches("Null"))
-                    user_height.setText("");
-                else
-                    user_height.setText(retrieve_height);
+                    if (retrieve_height.matches("Null"))
+                        user_height.setText("");
+                    else
+                        user_height.setText(retrieve_height);
 
 
-                if (retrieve_weight.matches("Null"))
-                    user_weight.setText("");
-                else
-                    user_weight.setText(retrieve_weight);
+                    if (retrieve_weight.matches("Null"))
+                        user_weight.setText("");
+                    else
+                        user_weight.setText(retrieve_weight);
 
 
-                if (retrieve_bloodgroup.matches("Null"))
-                    user_bloodgroup.setText("");
-                else
-                    user_bloodgroup.setText(retrieve_bloodgroup);
+                    if (retrieve_bloodgroup.matches("Null"))
+                        user_bloodgroup.setText("");
+                    else
+                        user_bloodgroup.setText(retrieve_bloodgroup);
 
 
-                if (retrieve_url.matches("Null"))
+                    if (retrieve_url.matches("Null"))
                         Picasso.with(context).load(R.drawable.invalid_person_image).into(user_image);
 
                         //Glide Gives Context Errors :(
@@ -188,7 +200,7 @@ public class ProfileFragment extends Fragment {
 //                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
 //                                .into(user_image);
                     else
-                    Picasso.with(getContext()).load(retrieve_url).into(user_image);
+                        Picasso.with(getContext()).load(retrieve_url).into(user_image);
 
                     //Glide Gives Context Errors :(
 //                        Glide.with(v.getContext())
@@ -198,54 +210,56 @@ public class ProfileFragment extends Fragment {
 //                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
 //                                .into(user_image);
 
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
-
-        user_save_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                final String mName = user_name.getText().toString().trim();
-                final String mPhone = user_phone.getText().toString().trim();
-                final String mAddress = user_address.getText().toString().trim();
-                final String mAge = user_age.getText().toString().trim();
-                final String mHeight = user_height.getText().toString().trim();
-                final String mWeight = user_weight.getText().toString().trim();
-                final String mBloodgroup = user_bloodgroup.getText().toString().trim();
-                if((mName.isEmpty() || mPhone.isEmpty() || mAddress.isEmpty() || mAge.isEmpty() || mHeight.isEmpty() || mWeight.isEmpty() || mBloodgroup.isEmpty())) {
-                    Toast.makeText(getContext(), "Fill all Field", Toast.LENGTH_SHORT).show();
-                    return;
                 }
-                Firebase childRef_name = mRoofRef.child("Name");
-                childRef_name.setValue(mName);
 
-                Firebase childRef_phone = mRoofRef.child("Phone");
-                childRef_phone.setValue(mPhone);
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
 
-                Firebase childRef_address = mRoofRef.child("Address");
-                childRef_address.setValue(mAddress);
+                }
+            });
 
-                Firebase childRef_age = mRoofRef.child("Age");
-                childRef_age.setValue(mAge);
+            user_save_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                Firebase childRef_height = mRoofRef.child("Height");
-                childRef_height.setValue(mHeight);
+                    final String mName = user_name.getText().toString().trim();
+                    final String mPhone = user_phone.getText().toString().trim();
+                    final String mAddress = user_address.getText().toString().trim();
+                    final String mAge = user_age.getText().toString().trim();
+                    final String mHeight = user_height.getText().toString().trim();
+                    final String mWeight = user_weight.getText().toString().trim();
+                    final String mBloodgroup = user_bloodgroup.getText().toString().trim();
+                    if ((mName.isEmpty() || mPhone.isEmpty() || mAddress.isEmpty() || mAge.isEmpty() || mHeight.isEmpty() || mWeight.isEmpty() || mBloodgroup.isEmpty())) {
+                        Toast.makeText(getContext(), "Fill all Field", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Firebase childRef_name = mRoofRef.child("Name");
+                    childRef_name.setValue(mName);
 
-                Firebase childRef_weight = mRoofRef.child("Weight");
-                childRef_weight.setValue(mWeight);
+                    Firebase childRef_phone = mRoofRef.child("Phone");
+                    childRef_phone.setValue(mPhone);
 
-                Firebase childRef_bloodgroup = mRoofRef.child("Bloodgroup");
-                childRef_bloodgroup.setValue(mBloodgroup);
-                Toast.makeText(getActivity(), "Updated Info", Toast.LENGTH_SHORT).show();
-            }
-        });
+                    Firebase childRef_address = mRoofRef.child("Address");
+                    childRef_address.setValue(mAddress);
 
-        return v;
+                    Firebase childRef_age = mRoofRef.child("Age");
+                    childRef_age.setValue(mAge);
+
+                    Firebase childRef_height = mRoofRef.child("Height");
+                    childRef_height.setValue(mHeight);
+
+                    Firebase childRef_weight = mRoofRef.child("Weight");
+                    childRef_weight.setValue(mWeight);
+
+                    Firebase childRef_bloodgroup = mRoofRef.child("Bloodgroup");
+                    childRef_bloodgroup.setValue(mBloodgroup);
+                    Toast.makeText(getActivity(), "Updated Info", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+            return v;
+
     }
 
 

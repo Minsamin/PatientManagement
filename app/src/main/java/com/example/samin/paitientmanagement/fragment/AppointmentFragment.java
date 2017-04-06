@@ -2,8 +2,6 @@ package com.example.samin.paitientmanagement.fragment;
 
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BlurMaskFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -57,6 +55,7 @@ public class AppointmentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         // Inflate the layout for this fragment
+
         View v = inflater.inflate(R.layout.fragment_appointment, container, false);
         //Log.d("Fragment","onCreateView Called");
 
@@ -107,9 +106,9 @@ public class AppointmentFragment extends Fragment {
 
             public void populateViewHolder(final DoctorDetailsViewHolder viewHolder, DoctorDetails model, final int position) {
                 viewHolder.Doctor_Name(model.getName());
-                viewHolder.Doctor_Email(model.getEmail());
+                viewHolder.Doctor_Chamber(model.getChamber());
                 viewHolder.Doctor_Image_URL(model.getImage_Url());
-                viewHolder.Doctor_Qualification(model.getQualification());
+                viewHolder.Doctor_Specialization(model.getSpecialization());
 
 
                 //OnClick Item
@@ -130,14 +129,22 @@ public class AppointmentFragment extends Fragment {
                                 String retrieve_name = map.get("Name");
                                 String retrieve_phone = map.get("Phone");
                                 String retrieve_Email = map.get("Email");
-                                String retrieve_url = map.get("Image_Url");
-                                String retrieve_Qualification = map.get("Qualification");
+                                String retrieve_url = map.get("Image_URL");
+                                String retrieve_Specialization = map.get("Specialization");
+                                String retrieve_Experience = map.get("Experience");
+                                String retrieve_Chamber = map.get("Chamber");
+                                String retrieve_Timing = map.get("Timing");
+                                String retrieve_Fees = map.get("Fees");
 
                                 intent.putExtra("image_id",retrieve_url);
                                 intent.putExtra("email",retrieve_Email);
                                 intent.putExtra("name",retrieve_name);
                                 intent.putExtra("phone",retrieve_phone);
-                                intent.putExtra("spec",retrieve_Qualification);
+                                intent.putExtra("specialization",retrieve_Specialization);
+                                intent.putExtra("experience",retrieve_Experience);
+                                intent.putExtra("chamber",retrieve_Chamber);
+                                intent.putExtra("timing",retrieve_Timing);
+                                intent.putExtra("fees",retrieve_Fees);
                                 getContext().startActivity(intent);
                             }
 
@@ -180,28 +187,27 @@ public class AppointmentFragment extends Fragment {
 
     //View Holder For Recycler View
     public static class DoctorDetailsViewHolder extends RecyclerView.ViewHolder {
-        private final TextView doctor_name, doctor_email, doctor_qualification;
+        private final TextView doctor_name, doctor_chamber, doctor_specialization;
         private final ImageView doctor_image;
 
         public DoctorDetailsViewHolder(final View itemView) {
             super(itemView);
             doctor_name = (TextView) itemView.findViewById(R.id.appointment_doctor_name);
-            doctor_email = (TextView) itemView.findViewById(R.id.appointment_doctor_email);
+            doctor_chamber = (TextView) itemView.findViewById(R.id.appointment_doctor_chamber);
             doctor_image = (ImageView) itemView.findViewById(R.id.appointment_doctor_image);
-            doctor_qualification = (TextView) itemView.findViewById(R.id.appointment_doctor_spec);
-
+            doctor_specialization = (TextView) itemView.findViewById(R.id.appointment_doctor_spec);
         }
 
         private void Doctor_Name(String title) {
             doctor_name.setText(title);
         }
 
-        private void Doctor_Email(String title) {
-            doctor_email.setText(title);
+        private void Doctor_Chamber(String title) {
+            doctor_chamber.setText(title);
         }
 
-        private void Doctor_Qualification(String title) {
-            doctor_qualification.setText(title);
+        private void Doctor_Specialization(String title) {
+            doctor_specialization.setText(title);
         }
 
         private void Doctor_Image_URL(String url) {
@@ -224,6 +230,14 @@ public class AppointmentFragment extends Fragment {
 
             else {
                 //Log.d("LOGGED", "I GOT THE URL " + url);
+                Glide.with(itemView.getContext())
+                        .load(R.drawable.invalid_person_image)
+                        .crossFade()
+                        .thumbnail(0.5f)
+                        .placeholder(R.drawable.loading)
+                        .bitmapTransform(new CircleTransform(itemView.getContext()))
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(doctor_image);
             }
         }
     }

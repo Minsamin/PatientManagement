@@ -148,8 +148,6 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
             }
         });
 
-
-
     }
 
 
@@ -168,36 +166,75 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
                             UserID=user.getEmail().replace("@","").replace(".","");
                             //mRoofRef= new Firebase("https://patient-management-11e26.firebaseio.com/"+"User_Details/"+UserID);
                             mRoofRef= new Firebase("https://patient-management-11e26.firebaseio.com/");
-                            userRef = mRoofRef.child("User_Details").child(UserID);
 
-                            userRef.child("Name").setValue("Null");
+                            if(RB_patient.isChecked())
+                            {
+                                userRef = mRoofRef.child("User_Details").child(UserID);
 
-                            userRef.child("Phone").setValue("Null");
+                                userRef.child("Name").setValue("Null");
 
-                            userRef.child("Address").setValue("Null");
+                                userRef.child("Phone").setValue("Null");
 
-                            userRef.child("Age").setValue("Null");
+                                userRef.child("Address").setValue("Null");
 
-                             userRef.child("Height").setValue("Null");
+                                userRef.child("Age").setValue("Null");
 
-                            userRef.child("Weight").setValue("Null");
+                                userRef.child("Height").setValue("Null");
 
-                            userRef.child("Bloodgroup").setValue("Null");
+                                userRef.child("Weight").setValue("Null");
 
-                            userRef.child("Image_URL").setValue("Null");
+                                userRef.child("Bloodgroup").setValue("Null");
+
+                                userRef.child("Image_URL").setValue("Null");
+
+                                userRef.child("User_Type").setValue("Patient");
+
+                                //Designation = "Patient";
+                            }
+
+
+
+
 
 
 
                             if(RB_doctor.isChecked())
                             {
+                                userRef = mRoofRef.child("Doctor_Detais").child(UserID);
+
+                                userRef.child("Name").setValue("Null");
+
+                                userRef.child("Phone").setValue("Null");
+
+                                userRef.child("Chamber").setValue("Null");
+
+                                userRef.child("Specialization").setValue("Null");
+
+                                userRef.child("Experience").setValue("Null");
+
+                                userRef.child("Fees").setValue("Null");
+
+                                userRef.child("Timing").setValue("Null");
+
                                 userRef.child("User_Type").setValue("Doctor");
-                                Designation = "Doctor";
+
+                                userRef.child("Image_URL").setValue("Null");
+
+                                userRef.child("Email").setValue(user.getEmail());
+
+                               // Designation = "Doctor";
+
+
+
+                                userRef = mRoofRef.child("User_Details").child(UserID);
+
+                                userRef.child("Name").setValue("Null");
+                                userRef.child("Image_URL").setValue("Null");
+
+                                userRef.child("User_Type").setValue("Doctor");
+
                             }
-                            if(RB_patient.isChecked())
-                            {
-                                userRef.child("User_Type").setValue("Patient");
-                                Designation = "Patient";
-                            }
+
 
                             Toast.makeText(Create_account.this, "Register Successfully. ", Toast.LENGTH_LONG).show();
 
@@ -229,33 +266,8 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
         Intent i= new Intent(this,login_activity.class);
         login_activity.login_Activity.finish();
         finish();
-       startActivity(i);
+        startActivity(i);
 
     }
-
-    //Set UserDisplay Name
-//    private void userProfile()
-//    {
-//        FirebaseUser user = firebaseAuth.getCurrentUser();
-//        if(user!= null)
-//        {
-//            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-//                    .setDisplayName(Name.getText().toString().trim().concat("_").concat(Designation))
-//                    //.setPhotoUri(Uri.parse("https://example.com/jane-q-user/profile.jpg"))  // here you can set image link also.
-//                    .build();
-//
-//            user.updateProfile(profileUpdates)
-//                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<Void> task) {
-//                            if (task.isSuccessful()) {
-//                                //Log.d("TESTING", "User profile updated.");
-//                            }
-//                        }
-//                    });
-//        }
-//
-//    }
-
 
 }

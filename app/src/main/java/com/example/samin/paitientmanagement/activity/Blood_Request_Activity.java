@@ -13,7 +13,7 @@ import com.firebase.client.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-/**
+/*
  * Created by Samin on 08-03-2017.
  */
 

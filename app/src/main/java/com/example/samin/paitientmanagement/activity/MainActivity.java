@@ -5,10 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -37,6 +35,7 @@ import com.example.samin.paitientmanagement.fragment.NotificationFragment;
 import com.example.samin.paitientmanagement.fragment.PathologyLabsFragment;
 import com.example.samin.paitientmanagement.fragment.PatientFragment;
 import com.example.samin.paitientmanagement.fragment.ProfileFragment;
+import com.example.samin.paitientmanagement.fragment.ProfileFragment_Doctor;
 import com.example.samin.paitientmanagement.fragment.SettingsFragment;
 import com.example.samin.paitientmanagement.other.CircleTransform;
 import com.firebase.client.DataSnapshot;
@@ -45,15 +44,9 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.FirebaseDatabase;
 import com.onesignal.OneSignal;
-
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Map;
-import java.util.Scanner;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -88,10 +81,11 @@ public class MainActivity extends AppCompatActivity {
     Firebase mRoofRef;
     FirebaseUser user;
 
-    static public String UserID,LoggedIn_User_Email;
+    static public String UserID;
     AlertDialog.Builder builder;
     String check;
     String version;
+    public static String app_user_type,LoggedIn_User_Email;
 
 
     @Override
@@ -106,17 +100,17 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(getApplicationContext(),login_activity.class));
         }
 
-        SharedPreferences sharedPreferences2 = getSharedPreferences("USER_DESIGNATION", MODE_PRIVATE);
-        String user_type = sharedPreferences2.getString("USER_TYPE",null);
+        // SharedPreferences sharedPreferences2 = getSharedPreferences("USER_DESIGNATION", MODE_PRIVATE);
+        // String user_type = sharedPreferences2.getString("USER_TYPE",null);
 
 
         user = firebaseAuth.getCurrentUser();
-        UserID = user.getEmail().replace("@", "").replace(".", "");
-
 
         //Set User's TAG
         LoggedIn_User_Email = user.getEmail();
         OneSignal.sendTag("User_ID", LoggedIn_User_Email);
+
+        UserID = LoggedIn_User_Email.replace("@", "").replace(".", "");
         View navHeader;
 
         setContentView(R.layout.activity_main);
@@ -139,52 +133,74 @@ public class MainActivity extends AppCompatActivity {
         // load toolbar titles from string resources
         activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
 
+       // Log.d("LOGGED", "CREATING DATABASE REFERENCE: ");
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+
 
         mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
 
 
-        mRoofRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, String> map = dataSnapshot.getValue(Map.class);
-                String retrieve_type = map.get("User_Type");
-                if(retrieve_type.equals("Doctor"))
-                {
-                    Toast.makeText(MainActivity.this, "I AM A DOCTOR", Toast.LENGTH_SHORT).show();
-                    Log.d("LOGGED", "I AM A DOCTOR: ");
-
-                    Toast.makeText(MainActivity.this, "Hello Doctor " + UserID, Toast.LENGTH_SHORT).show();
+        loadNavHeader();
+        setUpNavigationView();
 
 
-                    navigationView.getMenu().getItem(1).setVisible(false);
 
-                    // load nav menu header data
-                    loadNavHeader();
 
-                    // initializing navigation menu
-                    setUpNavigationView_doctor();
 
-                }
-                else
-                {
-                    Toast.makeText(MainActivity.this, "I AM A PATIENT", Toast.LENGTH_SHORT).show();
-                    Log.d("LOGGED", "I AM A PATIENT: ");
-                    Toast.makeText(MainActivity.this, "Hello Patient " + UserID, Toast.LENGTH_SHORT).show();
 
-                    // load nav menu header data
-                    loadNavHeader();
+//
+//        mRoofRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                Map<String, String> map = dataSnapshot.getValue(Map.class);
+//                String retrieve_type = map.get("User_Type");
+//
+//                drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+//                if(retrieve_type.equals("Doctor"))
+//                {
+//                    Toast.makeText(MainActivity.this, "I AM A DOCTOR", Toast.LENGTH_SHORT).show();
+//                    Log.d("LOGGED", "I AM A DOCTOR: ");
+//
+//                    Toast.makeText(MainActivity.this, "Hello Doctor " + UserID, Toast.LENGTH_SHORT).show();
+//
+//
+//                    navigationView.getMenu().getItem(1).setVisible(false);
+//
+//                    // load nav menu header data
+//                    loadNavHeader();
+//
+//                    // initializing navigation menu
+//                    setUpNavigationView_doctor();
+//
+//                }
+//                else
+//                {
+//                    Toast.makeText(MainActivity.this, "I AM A PATIENT", Toast.LENGTH_SHORT).show();
+//                    Log.d("LOGGED", "I AM A PATIENT: ");
+//                    Toast.makeText(MainActivity.this, "Hello Patient " + UserID, Toast.LENGTH_SHORT).show();
+//
+//                    // load nav menu header data
+//                    loadNavHeader();
+//
+//                    // initializing navigation menu
+//                    setUpNavigationView();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(FirebaseError firebaseError) {
+//
+//            }
+//        });
 
-                    // initializing navigation menu
-                    setUpNavigationView();
-                }
-            }
 
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
 
-            }
-        });
 
+
+
+
+        //Log.d("LOGGED", "CHECKING BUILD VERSION_NAME : ");
 
         version = BuildConfig.VERSION_NAME;
         //Shared Preference
@@ -195,6 +211,10 @@ public class MainActivity extends AppCompatActivity {
          */
         SharedPreferences sharedPreferences = getSharedPreferences("Update", MODE_PRIVATE);
         check =sharedPreferences.getString("update_later",version);
+
+
+
+
 
 
 
@@ -232,8 +252,15 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
         //Async Task
+
+
+
+
+
+
+
         mHandler = new Handler();
-        Log.d("LOGGED", "I waited ");
+        // Log.d("LOGGED", "I waited ");
 
 
         if (savedInstanceState == null) {
@@ -246,20 +273,22 @@ public class MainActivity extends AppCompatActivity {
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                navItemIndex = 7;
+                navItemIndex = 8;
                 CURRENT_TAG = TAG_PROFILE;
                 loadHomeFragment();
             }
         });
 
-
-
-
+       // Log.d("LOGGED", "ON CREATE COMPLETED : ");
     }
 
 
 
+
+
     private void loadNavHeader() {
+
+        //Log.d("LOGGED", "LOAD NAV HEADER INSERTED  : ");
 
         Glide.with(this)
                 .load(R.drawable.nav_menu_header_bg)
@@ -268,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
                 .into(imgNavHeaderBg);
 
 
-        Toast.makeText(MainActivity.this, "Welcome  !!  ", Toast.LENGTH_LONG).show();
+       // Toast.makeText(MainActivity.this, "Welcome  !!  ", Toast.LENGTH_LONG).show();
         txtName.setText("Welcome,");
 
 
@@ -280,12 +309,40 @@ public class MainActivity extends AppCompatActivity {
 
                 String retrieve_name = map.get("Name");
                 String retrieve_url = map.get("Image_URL");
+                String retrieve_type = map.get("User_Type");
+
+                drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                if(retrieve_type.equals("Doctor"))
+                {
+                    Toast.makeText(MainActivity.this, "Welcome  !! ", Toast.LENGTH_SHORT).show();
+                   // Log.d("LOGGED", "I AM A DOCTOR: ");
+                    navigationView.getMenu().getItem(1).setVisible(false);
+                    //navigationView.getMenu().getItem(2).setVisible(true);
+                    navigationView.getMenu().getItem(3).setVisible(false);
+                    app_user_type = "Doctor";
+                }
+                if(retrieve_type.equals("Patient"))
+                {
+                    //Log.d("LOGGED", "I AM A PATIENT: ");
+                    app_user_type = "Patient";
+                    navigationView.getMenu().getItem(2).setVisible(false);
+                    //navigationView.getMenu().getItem(3).setVisible(true);
+                    Toast.makeText(MainActivity.this, "Welcome  !! ", Toast.LENGTH_SHORT).show();
+
+
+                }
+
+
+
+
                 if (retrieve_name != null)
                 {
                     if (retrieve_name.equals("Null"))
                         txtWebsite.setText(user.getEmail());
                     else
                         txtWebsite.setText(retrieve_name);
+
+                    //Log.d("LOGGED", "EMAIL SET IN - - LOAD NAV HEADER   : ");
                 }
 
                 if (retrieve_url != null)
@@ -308,6 +365,7 @@ public class MainActivity extends AppCompatActivity {
                                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .into(imgProfile);
                     }
+                    //Log.d("LOGGED", "IMAGE SET IN - - LOAD NAV HEADER   : ");
                 }
             }
 
@@ -319,7 +377,7 @@ public class MainActivity extends AppCompatActivity {
         navigationView.getMenu().getItem(6).setActionView(R.layout.menu_dot);
 
 
-       // final String version = BuildConfig.VERSION_NAME;
+        // final String version = BuildConfig.VERSION_NAME;
         mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/Update_APK");
         mRoofRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -329,6 +387,8 @@ public class MainActivity extends AppCompatActivity {
                 final String retrieve_version = map.get("Version");
                 final String retrieve_changelog = map.get("Changelog");
 
+                //Log.d("LOGGED", "UPDATE CHECKING - - LOAD NAV HEADER   : ");
+
 
                 if (!check.equals(retrieve_version)) {
                     if (!retrieve_version.equals(version))
@@ -336,35 +396,35 @@ public class MainActivity extends AppCompatActivity {
 
                         //Log.d("LOGGED", "Inside IF " +check);
                         builder = new AlertDialog.Builder(MainActivity.this);
-                    //builder.setMessage("A latest Version is Available ").setCancelable(true)
-                    builder.setMessage(Html.fromHtml(retrieve_changelog)).setCancelable(true)
-                            .setPositiveButton("Download", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Intent i = new Intent(Intent.ACTION_VIEW);
-                                    i.setData(Uri.parse(retrieve_url));
-                                    startActivity(i);
-                                }
-                            })
-                            .setNegativeButton("Later", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(MainActivity.this, "Check Settings to Update.", Toast.LENGTH_LONG).show();
+                        //builder.setMessage("A latest Version is Available ").setCancelable(true)
+                        builder.setMessage(Html.fromHtml(retrieve_changelog)).setCancelable(true)
+                                .setPositiveButton("Download", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent i = new Intent(Intent.ACTION_VIEW);
+                                        i.setData(Uri.parse(retrieve_url));
+                                        startActivity(i);
+                                    }
+                                })
+                                .setNegativeButton("Later", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Toast.makeText(MainActivity.this, "Check Settings to Update.", Toast.LENGTH_LONG).show();
 
-                                    SharedPreferences sharedPreferences = getSharedPreferences("Update", MODE_PRIVATE);
-                                    SharedPreferences.Editor mEditor = sharedPreferences.edit();
-                                    mEditor.putString("update_later", retrieve_version);
-                                    mEditor.apply();
+                                        SharedPreferences sharedPreferences = getSharedPreferences("Update", MODE_PRIVATE);
+                                        SharedPreferences.Editor mEditor = sharedPreferences.edit();
+                                        mEditor.putString("update_later", retrieve_version);
+                                        mEditor.apply();
 
-                                    //Log.d("LOGGED", "Updated value " +retrieve_version);
-                                    dialog.cancel();
-                                }
-                            });
+                                        //Log.d("LOGGED", "Updated value " +retrieve_version);
+                                        dialog.cancel();
+                                    }
+                                });
 
-                    AlertDialog dialog = builder.create();
-                    dialog.setTitle("Update Available ! ");
-                    dialog.show();
-                }
+                        AlertDialog dialog = builder.create();
+                        dialog.setTitle("Update Available ! ");
+                        dialog.show();
+                    }
                 }
             }
 
@@ -382,6 +442,7 @@ public class MainActivity extends AppCompatActivity {
      * selected from navigation menu
      */
     private void loadHomeFragment() {
+       // Log.d("LOGGED", "HOME FRAGMENT CALLED    : ");
         // selecting appropriate nav menu item
         selectNavMenu();
 
@@ -396,7 +457,7 @@ public class MainActivity extends AppCompatActivity {
             drawer.closeDrawers();
 
             // show or hide the fab button
-           // toggleFab();
+            // toggleFab();
             return;
         }
 
@@ -432,6 +493,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Fragment getHomeFragment() {
+       // Log.d("LOGGED", "GET HOME FRAGMENT CALLED   : ");
         switch (navItemIndex) {
             case 0:
                 // home
@@ -441,16 +503,26 @@ public class MainActivity extends AppCompatActivity {
             case 2:
                 return new PatientFragment();
             case 3:
-                return new HealthTipsFragment();
+                return new PatientFragment();
             case 4:
-                return new PathologyLabsFragment();
+                return new HealthTipsFragment();
             case 5:
-                return new BloodBankFragment();
+                return new PathologyLabsFragment();
             case 6:
-                return new NotificationFragment();
+                return new BloodBankFragment();
             case 7:
-                return new ProfileFragment();
+                return new NotificationFragment();
             case 8:
+                if(app_user_type.equals("Doctor"))
+                {
+                    return new ProfileFragment_Doctor();
+                }
+                else if(app_user_type.equals("Patient"))
+                {
+                    return new ProfileFragment();
+                }
+
+            case 9:
                 //settings fragment
                 return new SettingsFragment();
             default:
@@ -467,6 +539,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpNavigationView() {
+        //Log.d("LOGGED", "SET UP NAVIGATION VIEW CALLED   : ");
         //Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
 
@@ -492,137 +565,34 @@ public class MainActivity extends AppCompatActivity {
                         navItemIndex = 2;
                         CURRENT_TAG = TAG_PATIENT;
                         break;
-
-                    case R.id.nav_health:
+                    case R.id.nav_patient2:
                         navItemIndex = 3;
-                        CURRENT_TAG = TAG_HEALTH_TIPS;
-                        break;
-                    case R.id.nav_pathology:
-                        navItemIndex = 4;
-                        CURRENT_TAG = TAG_PATHOLOGY_LABS;
-                        break;
-                    case R.id.nav_bloodbank:
-                        navItemIndex = 5;
-                        CURRENT_TAG = TAG_BLOOD_BANKS;
-                        break;
-
-                    case R.id.nav_notifications:
-                        navItemIndex = 6;
-                        CURRENT_TAG = TAG_NOTIFICATIONS;
-                        break;
-                    case R.id.nav_profile:
-                        navItemIndex = 7;
-                        CURRENT_TAG = TAG_PROFILE;
-                        break;
-                    case R.id.nav_settings:
-                        navItemIndex = 8;
-                        CURRENT_TAG = TAG_SETTINGS;
-                        break;
-
-
-                    case R.id.nav_about_us:
-                        // launch new intent instead of loading fragment
-                        startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
-                        drawer.closeDrawers();
-                        return true;
-                    case R.id.nav_privacy_policy:
-                        // launch new intent instead of loading fragment
-                        startActivity(new Intent(MainActivity.this, PrivacyPolicyActivity.class));
-                        drawer.closeDrawers();
-                        return true;
-                    default:
-                        navItemIndex = 0;
-                }
-
-                //Checking if the item is in checked state or not, if not make it in checked state
-                if (menuItem.isChecked()) {
-                    menuItem.setChecked(false);
-                } else {
-                    menuItem.setChecked(true);
-                }
-                menuItem.setChecked(true);
-
-                loadHomeFragment();
-
-                return true;
-            }
-        });
-
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer) {
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                // Code here will be triggered once the drawer closes as we dont want anything to happen so we leave this blank
-                super.onDrawerClosed(drawerView);
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
-                super.onDrawerOpened(drawerView);
-            }
-        };
-
-        //Setting the actionbarToggle to drawer layout
-        drawer.setDrawerListener(actionBarDrawerToggle);
-
-        //calling sync state is necessary or else your hamburger icon wont show up
-        actionBarDrawerToggle.syncState();
-    }
-
-
-
-
-    private void setUpNavigationView_doctor() {
-        //Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-
-            // This method will trigger on item Click of navigation menu
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-
-                //Check to see which item was being clicked and perform appropriate action
-                switch (menuItem.getItemId()) {
-                    //Replacing the main content with ContentFragment Which is our Inbox View;
-
-                    case R.id.nav_home:
-                        navItemIndex = 0;
-                        CURRENT_TAG = TAG_HOME;
-                        break;
-
-//                    case R.id.nav_appointment:
-//                        navItemIndex = 1;
-//                        CURRENT_TAG = TAG_APPOINTMENT;
-//                        break;
-
-                    case R.id.nav_patient:
-                        navItemIndex = 2;
                         CURRENT_TAG = TAG_PATIENT;
                         break;
 
                     case R.id.nav_health:
-                        navItemIndex = 3;
+                        navItemIndex = 4;
                         CURRENT_TAG = TAG_HEALTH_TIPS;
                         break;
                     case R.id.nav_pathology:
-                        navItemIndex = 4;
+                        navItemIndex = 5;
                         CURRENT_TAG = TAG_PATHOLOGY_LABS;
                         break;
                     case R.id.nav_bloodbank:
-                        navItemIndex = 5;
+                        navItemIndex = 6;
                         CURRENT_TAG = TAG_BLOOD_BANKS;
                         break;
 
                     case R.id.nav_notifications:
-                        navItemIndex = 6;
+                        navItemIndex = 7;
                         CURRENT_TAG = TAG_NOTIFICATIONS;
                         break;
                     case R.id.nav_profile:
-                        navItemIndex = 7;
+                        navItemIndex = 8;
                         CURRENT_TAG = TAG_PROFILE;
                         break;
                     case R.id.nav_settings:
-                        navItemIndex = 8;
+                        navItemIndex = 9;
                         CURRENT_TAG = TAG_SETTINGS;
                         break;
 
@@ -669,13 +639,123 @@ public class MainActivity extends AppCompatActivity {
                 super.onDrawerOpened(drawerView);
             }
         };
-
+        //Log.d("LOGGED", "SETTING actionbarToggle to drawer layout 'PATIENT'  : ");
         //Setting the actionbarToggle to drawer layout
         drawer.setDrawerListener(actionBarDrawerToggle);
 
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
     }
+
+
+
+
+//    private void setUpNavigationView_doctor()
+// {
+//
+//     Log.d("LOGGED", "SET NAVIGATION VIEW FOR DOCTOR  : ");
+//        //Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
+//        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+//
+//            // This method will trigger on item Click of navigation menu
+//            @Override
+//            public boolean onNavigationItemSelected(MenuItem menuItem) {
+//
+//                //Check to see which item was being clicked and perform appropriate action
+//                switch (menuItem.getItemId()) {
+//                    //Replacing the main content with ContentFragment Which is our Inbox View;
+//
+//                    case R.id.nav_home:
+//                        navItemIndex = 0;
+//                        CURRENT_TAG = TAG_HOME;
+//                        break;
+//
+////                    case R.id.nav_appointment:
+////                        navItemIndex = 1;
+////                        CURRENT_TAG = TAG_APPOINTMENT;
+////                        break;
+//
+//                    case R.id.nav_patient:
+//                        navItemIndex = 2;
+//                        CURRENT_TAG = TAG_PATIENT;
+//                        break;
+//
+//                    case R.id.nav_health:
+//                        navItemIndex = 3;
+//                        CURRENT_TAG = TAG_HEALTH_TIPS;
+//                        break;
+//                    case R.id.nav_pathology:
+//                        navItemIndex = 4;
+//                        CURRENT_TAG = TAG_PATHOLOGY_LABS;
+//                        break;
+//                    case R.id.nav_bloodbank:
+//                        navItemIndex = 5;
+//                        CURRENT_TAG = TAG_BLOOD_BANKS;
+//                        break;
+//
+//                    case R.id.nav_notifications:
+//                        navItemIndex = 6;
+//                        CURRENT_TAG = TAG_NOTIFICATIONS;
+//                        break;
+//                    case R.id.nav_profile:
+//                        navItemIndex = 7;
+//                        CURRENT_TAG = TAG_PROFILE;
+//                        break;
+//                    case R.id.nav_settings:
+//                        navItemIndex = 8;
+//                        CURRENT_TAG = TAG_SETTINGS;
+//                        break;
+//
+//
+//                    case R.id.nav_about_us:
+//                        // launch new intent instead of loading fragment
+//                        startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
+//                        drawer.closeDrawers();
+//                        return true;
+//                    case R.id.nav_privacy_policy:
+//                        // launch new intent instead of loading fragment
+//                        startActivity(new Intent(MainActivity.this, PrivacyPolicyActivity.class));
+//                        drawer.closeDrawers();
+//                        return true;
+//                    default:
+//                        navItemIndex = 0;
+//                }
+//
+//                //Checking if the item is in checked state or not, if not make it in checked state
+//                if (menuItem.isChecked()) {
+//                    menuItem.setChecked(false);
+//                } else {
+//                    menuItem.setChecked(true);
+//                }
+//                menuItem.setChecked(true);
+//
+//                loadHomeFragment();
+//
+//                return true;
+//            }
+//        });
+//
+//        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer) {
+//
+//            @Override
+//            public void onDrawerClosed(View drawerView) {
+//                // Code here will be triggered once the drawer closes as we dont want anything to happen so we leave this blank
+//                super.onDrawerClosed(drawerView);
+//            }
+//
+//            @Override
+//            public void onDrawerOpened(View drawerView) {
+//                // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
+//                super.onDrawerOpened(drawerView);
+//            }
+//        };
+//     Log.d("LOGGED", "SETTING actionbarToggle to drawer layout 'DOCTOR'  : ");
+//        //Setting the actionbarToggle to drawer layout
+//        drawer.setDrawerListener(actionBarDrawerToggle);
+//
+//        //calling sync state is necessary or else your hamburger icon wont show up
+//        actionBarDrawerToggle.syncState();
+//    }
 
 
 
@@ -695,16 +775,16 @@ public class MainActivity extends AppCompatActivity {
 
         // This code loads home fragment when back key is pressed
         // when user is in other fragment than home
-            // checking if user is on other navigation menu
-            // rather than home
-            if (navItemIndex != 0)
-            {
-                navItemIndex = 0;
-                CURRENT_TAG = TAG_HOME;
-                loadHomeFragment();
-                return;
-            }
-       // }
+        // checking if user is on other navigation menu
+        // rather than home
+        if (navItemIndex != 0)
+        {
+            navItemIndex = 0;
+            CURRENT_TAG = TAG_HOME;
+            loadHomeFragment();
+            return;
+        }
+        // }
 
         //super.onBackPressed();
         finish();
@@ -713,6 +793,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+
+       // Log.d("LOGGED", "CREATE OPTION MENU: ");
 
         // show menu only when home fragment is selected
         if (navItemIndex == 0 || navItemIndex==1 || navItemIndex==2 || navItemIndex==3 || navItemIndex==4 || navItemIndex==5 || navItemIndex==7 || navItemIndex==8) {

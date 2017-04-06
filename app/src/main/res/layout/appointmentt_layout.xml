@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Make an Appointment"
+        android:layout_gravity="center"
         android:textSize="24sp"
         android:textColor="#6C5B7B"
         android:layout_marginBottom="20dp"
