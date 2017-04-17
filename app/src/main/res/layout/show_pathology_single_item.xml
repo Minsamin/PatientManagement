@@ -4,8 +4,7 @@
     xmlns:card_view="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="#EEEEEE">
+    android:orientation="vertical">
 
 
     <android.support.v7.widget.CardView
@@ -15,7 +14,7 @@
         app:contentPadding="3dp"
         card_view:cardCornerRadius="5dp"
         card_view:cardElevation="2dp"
-        android:id="@+id/card_view2"
+        android:id="@+id/show_appointment_card"
         app:cardBackgroundColor="#FAFAFA"
         app:cardCornerRadius="5dp"
         card_view:cardUseCompatPadding="true">
@@ -30,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@color/colorPrimary">
+                android:background="#2299de">
 
                 <TextView
                     android:id="@+id/fetch_pathology_name"

@@ -70,6 +70,13 @@
 
     <string name="changelog_body">
 
+        <b><u>PM 2.3 - Changes:</u></b>\n
+
+        &#8226; Colored UI. \n
+        &#8226; Patient History (For Doctors). \n
+        &#8226; Doctors can Approve Appointments. \n
+        &#8226; All Existing Appointments are Deleted for Altering in Database Structure. \n\n
+
         <b><u>PM 2.2 - Changes:</u></b>\n
 
         &#8226; Separated views or Layout for Doctors and Patients. \n
@@ -171,6 +178,8 @@
         at Jamshedpur provide curative healthcare services to the employees of Tata Steel and their families free of cost. Apart from TMH and the dispensaries, out-location hospitals are located at Jamadoba, Noamundi and Sukhinda Mines and West Bokaro Collieries.
         TMH also extends its facilities to non-entitled patients from Jamshedpur and its surrounding area.</string>
     <string name="demo">DEMO</string>
+    <string name="desc">Content Description</string>
+    <string name="Null">NULL</string>
 
 
 </resources>

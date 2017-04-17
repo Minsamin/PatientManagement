@@ -14,7 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".activity.PaitientManagement">
-        <activity android:name=".activity.login_activity">
+        <activity
+            android:name=".activity.login_activity"
+            android:screenOrientation="portrait">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,14 +25,24 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.MainActivity"/>
-        <activity android:name=".activity.AboutUsActivity"/>
-        <activity android:name=".activity.PrivacyPolicyActivity"/>
-        <activity android:name=".activity.PersonalInfo"/>
-        <activity android:name=".activity.Create_account"/>
-        <activity android:name=".activity.Show_Appointments"/>
-        <activity android:name=".activity.Blood_Request_Activity"/>
-        <activity android:name=".activity.Show_blood_request"/>
+        <activity android:name=".activity.MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.AboutUsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.PrivacyPolicyActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.PersonalInfo"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.Create_account"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.Show_Appointments"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.Blood_Request_Activity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.Show_blood_request"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.PatientProfile"
+            android:screenOrientation="portrait"/>
 
 
     </application>

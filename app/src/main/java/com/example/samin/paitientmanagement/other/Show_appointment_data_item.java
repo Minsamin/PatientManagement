@@ -15,9 +15,12 @@ public class Show_appointment_data_item {
     private String Appointment_Reason;
     private String Patient_Name;
     private String Patient_Phone;
+    private String Patient_Email;
+    private String Request_Status;
 
 
-    public Show_appointment_data_item(String Appointment_Doctor_Name, String Appointment_Doctor_Email, String Appointment_Doctor_phone, String Appointment_Date, String Appointment_Reason, String Patient_Name, String Patient_Phone) {
+
+    public Show_appointment_data_item(String Appointment_Doctor_Name, String Appointment_Doctor_Email, String Appointment_Doctor_phone, String Appointment_Date, String Appointment_Reason, String Patient_Name, String Patient_Phone,String Patient_Email,String Request_Status) {
         this.Appointment_Doctor_Name = Appointment_Doctor_Name;
         this.Appointment_Doctor_Email = Appointment_Doctor_Email;
         this.Appointment_Doctor_phone = Appointment_Doctor_phone;
@@ -25,6 +28,8 @@ public class Show_appointment_data_item {
         this.Appointment_Reason = Appointment_Reason;
         this.Patient_Name = Patient_Name;
         this.Patient_Phone = Patient_Phone;
+        this.Patient_Email = Patient_Email;
+        this.Request_Status = Request_Status;
 
     }
 
@@ -87,4 +92,28 @@ public class Show_appointment_data_item {
     public void setPatient_Phone(String Patient_Phone) {
         this.Patient_Phone = Patient_Phone;
     }
+
+
+
+    public String getPatient_Email() {
+        return Patient_Email;
+    }
+
+    public void setPatient_Email(String Patient_Email) {
+        this.Patient_Email = Patient_Email;
+    }
+
+
+     public String getRequest_Status() {
+        return Request_Status;
+    }
+
+    public void setRequest_Status(String Request_Status) {
+        this.Request_Status = Request_Status;
+    }
+
+
+
+
+
 }

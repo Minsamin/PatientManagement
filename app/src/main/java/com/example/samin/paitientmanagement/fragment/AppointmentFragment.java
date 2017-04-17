@@ -7,11 +7,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +32,8 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import java.util.Map;
 
+import static com.example.samin.paitientmanagement.activity.MainActivity.MainActivityLoaded;
+
 public class AppointmentFragment extends Fragment {
 
     private Spinner spinner;
@@ -38,6 +42,9 @@ public class AppointmentFragment extends Fragment {
     FirebaseDatabase firebaseDatabase;
     DatabaseReference myRef;
     private FirebaseRecyclerAdapter<DoctorDetails, DoctorDetailsViewHolder> mFirebaseAdapter;
+    ProgressBar progressBar;
+    LinearLayoutManager mLinearLayoutManager;
+    //Boolean flag = true;
 
     public AppointmentFragment() {
         // Required empty public constructor
@@ -49,6 +56,11 @@ public class AppointmentFragment extends Fragment {
         super.onCreate(savedInstanceState);
         firebaseDatabase = FirebaseDatabase.getInstance();
         myRef = firebaseDatabase.getReference("Doctor_Detais");
+        //progressBar = new ProgressBar(getContext());
+//        if(flag)
+//            Toast.makeText(getContext(), "Wait !  Fetching List...", Toast.LENGTH_SHORT).show();
+//        flag=false;
+        Log.d("LOGGED", "onCreate Called : ");
     }
 
     @Override
@@ -58,34 +70,41 @@ public class AppointmentFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_appointment, container, false);
         //Log.d("Fragment","onCreateView Called");
+        progressBar = (ProgressBar) v.findViewById(R.id.progressBar2);
 
         //Recycler View
         recyclerView = (RecyclerView)v.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        mLinearLayoutManager = new LinearLayoutManager(getContext());
+        //mLinearLayoutManager.setStackFromEnd(true);
+
+        recyclerView.setLayoutManager(mLinearLayoutManager);
+        Log.d("LOGGED", "onCreateView Called : ");
+
+        //recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+
+
 
         txt=(TextView)v.findViewById(R.id.tv_department);
 
         Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "fonts/RobotoCondensed-Regular.ttf");
         txt.setTypeface(font);
 
-        Toast.makeText(getContext(), "Wait !  Fetching List...", Toast.LENGTH_SHORT).show();
+
 
        spinner = (Spinner) v.findViewById(R.id.spinner);
+
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             String firstItem = String.valueOf(spinner.getSelectedItem());
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
-                if (firstItem.equals(String.valueOf(spinner.getSelectedItem())))
+                if (!firstItem.equals(spinner.getSelectedItem()))
                 {
-                    // ToDo when first item is selected
-                } else
-                {
-                    Toast.makeText(parent.getContext(),
-                            "Doctors in " + parent.getItemAtPosition(position).toString(),
-                            Toast.LENGTH_SHORT).show();
-                    // Todo when item is selected by the user
+                    Toast.makeText(parent.getContext(),"Doctors in " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
+                    firstItem = String.valueOf(spinner.getSelectedItem());
                 }
             }
 
@@ -101,14 +120,26 @@ public class AppointmentFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+        if(MainActivityLoaded.equals("1"))
+        {
+            Toast.makeText(getContext(), "Wait !  Fetching List...", Toast.LENGTH_SHORT).show();
+            MainActivityLoaded = "0";
+        }
+        Log.d("LOGGED", "Will Start Calling populateViewHolder : ");
         //Log.d("LOGGED", "IN onStart ");
         mFirebaseAdapter = new FirebaseRecyclerAdapter<DoctorDetails, DoctorDetailsViewHolder>(DoctorDetails.class, R.layout.card_doctor_layout, DoctorDetailsViewHolder.class, myRef) {
 
             public void populateViewHolder(final DoctorDetailsViewHolder viewHolder, DoctorDetails model, final int position) {
-                viewHolder.Doctor_Name(model.getName());
-                viewHolder.Doctor_Chamber(model.getChamber());
-                viewHolder.Doctor_Image_URL(model.getImage_Url());
-                viewHolder.Doctor_Specialization(model.getSpecialization());
+                //Log.d("LOGGED", "populateViewHolder Called: ");
+                progressBar.setVisibility(ProgressBar.INVISIBLE);
+
+                if (!model.getName().equals("Null")) {
+                    viewHolder.Doctor_Name(model.getName());
+                    viewHolder.Doctor_Chamber(model.getChamber());
+                    viewHolder.Doctor_Image_URL(model.getImage_Url());
+                    viewHolder.Doctor_Specialization(model.getSpecialization());
+            }
 
 
                 //OnClick Item
@@ -155,10 +186,54 @@ public class AppointmentFragment extends Fragment {
                     }
                 });
             }
+
         };
 
 
+//        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+//            @Override
+//            public void onItemRangeInserted(int positionStart, int itemCount) {
+//                Log.d("LOGGED", "registerAdapterDataObserver Called: ");
+//                super.onItemRangeInserted(positionStart, itemCount);
+//                int friendlyMessageCount = mFirebaseAdapter.getItemCount();
+//
+//                int lastVisiblePosition =
+//                        mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+//                // If the recycler view is initially being loaded or the
+//                // user is at the bottom of the list, scroll to the bottom
+//                // of the list to show the newly added message.
+//                if (lastVisiblePosition == -1 ||
+//                        (positionStart >= (friendlyMessageCount - 1) &&
+//                                lastVisiblePosition == (positionStart - 1))) {
+//                    Log.d("LOGGED", "IF  registerAdapterDataObserver Called: ");
+//                    recyclerView.scrollToPosition(positionStart);
+//                }
+//            }
+//        });
+
+//        //Log.d("LOGGED", "setAdapter Called: ");
         recyclerView.setAdapter(mFirebaseAdapter);
+//       // Log.d("LOGGED", "populateViewHolder Exit: ");
+//
+//        if(recyclerView.isActivated())
+//        {
+//            Log.d("LOGGED", "recyclerView is Activated : ");
+//        }
+//
+//        if(recyclerView.isShown())
+//        {
+//            Log.d("LOGGED", "recyclerView is Shown : ");
+//        }
+//
+//        if(recyclerView.isAttachedToWindow())
+//        {
+//            Log.d("LOGGED", "recyclerView is Attached To Window : ");
+//        }
+//
+//        if(recyclerView.isFocused())
+//        {
+//            Log.d("LOGGED", "recyclerView is Focused: ");
+//        }
     }
 
 //    @Override
@@ -186,19 +261,22 @@ public class AppointmentFragment extends Fragment {
 //    }
 
     //View Holder For Recycler View
-    public static class DoctorDetailsViewHolder extends RecyclerView.ViewHolder {
+    private static class DoctorDetailsViewHolder extends RecyclerView.ViewHolder {
         private final TextView doctor_name, doctor_chamber, doctor_specialization;
         private final ImageView doctor_image;
 
         public DoctorDetailsViewHolder(final View itemView) {
             super(itemView);
+            Log.d("LOGGED", "View Holder Called: ");
             doctor_name = (TextView) itemView.findViewById(R.id.appointment_doctor_name);
             doctor_chamber = (TextView) itemView.findViewById(R.id.appointment_doctor_chamber);
             doctor_image = (ImageView) itemView.findViewById(R.id.appointment_doctor_image);
             doctor_specialization = (TextView) itemView.findViewById(R.id.appointment_doctor_spec);
         }
 
+
         private void Doctor_Name(String title) {
+           // Log.d("LOGGED", "Setting Name: ");
             doctor_name.setText(title);
         }
 
@@ -217,6 +295,7 @@ public class AppointmentFragment extends Fragment {
 //                        .load(url)
 //                        .placeholder(R.drawable.loading)
 //                        .into(doctor_image);
+                Log.d("LOGGED", "Setting Image: ");
 
                 Glide.with(itemView.getContext())
                         .load(url)

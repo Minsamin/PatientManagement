@@ -165,6 +165,7 @@ public class PersonalInfo extends AppCompatActivity
         String getPhone = your_phone.getText().toString().trim();
         String getDate = your_appoint_date.getText().toString().trim();
         String getReason = your_appoint_reason.getText().toString().trim();
+
         if(TextUtils.isEmpty(getName)) {
             Toast.makeText(this, "Name Require", Toast.LENGTH_SHORT).show();
             return;
@@ -198,6 +199,9 @@ public class PersonalInfo extends AppCompatActivity
         userRef.child("Creation_Time").setValue(current_time_format.format( new Date()));
         userRef.child("Creation_Date").setValue(current_date_format.format( new Date()));
         userRef.child("Request_Status").setValue("Pending");
+        userRef.child("Patient_Email").setValue(MainActivity.LoggedIn_User_Email);
+        userRef.child("Approval_Tracking").setValue(intent_email.trim()+" + "+ current_time_format.format( new Date()) + " + " + current_date_format.format( new Date()));
+
 
         Firebase mRoofRef2 = new Firebase("https://patient-management-11e26.firebaseio.com/");
         Firebase userRef2 = mRoofRef2.child("Doctor_Appointment").child(intent_email.trim().replace("@","").replace(".","")).push();
@@ -211,7 +215,13 @@ public class PersonalInfo extends AppCompatActivity
         userRef2.child("Creation_Time").setValue(current_time_format.format( new Date()));
         userRef2.child("Creation_Date").setValue(current_date_format.format( new Date()));
         userRef2.child("Request_Status").setValue("Pending");
+        userRef2.child("Patient_Email").setValue(MainActivity.LoggedIn_User_Email);
+        userRef2.child("Approval_Tracking").setValue(intent_email.trim()+" + "+ current_time_format.format( new Date()) + " + " + current_date_format.format( new Date()));
+
+
+
         Toast.makeText(this, "Appointment Registered", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Email was: " + MainActivity.LoggedIn_User_Email, Toast.LENGTH_SHORT).show();
 
         your_name.setText("");
         your_phone.setText("");

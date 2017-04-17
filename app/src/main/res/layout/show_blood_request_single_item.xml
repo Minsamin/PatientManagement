@@ -15,7 +15,7 @@
         app:contentPadding="3dp"
         card_view:cardCornerRadius="5dp"
         card_view:cardElevation="2dp"
-        android:id="@+id/card_view2"
+        android:id="@+id/show_appointment_card"
         app:cardBackgroundColor="#FAFAFA"
         app:cardCornerRadius="5dp"
         card_view:cardUseCompatPadding="true">

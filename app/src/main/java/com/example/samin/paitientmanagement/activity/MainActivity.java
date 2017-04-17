@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
     Firebase mRoofRef;
     FirebaseUser user;
 
-    static public String UserID;
+    static public String UserID,MainActivityLoaded;
     AlertDialog.Builder builder;
     String check;
     String version;
@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
             startActivity(new Intent(getApplicationContext(),login_activity.class));
         }
+        MainActivityLoaded = "1";
 
         // SharedPreferences sharedPreferences2 = getSharedPreferences("USER_DESIGNATION", MODE_PRIVATE);
         // String user_type = sharedPreferences2.getString("USER_TYPE",null);
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setItemIconTintList(null);
         // fab = (FloatingActionButton) findViewById(R.id.fab);
 
         // Navigation view header
