@@ -1,26 +1,28 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragment.PatientFragment"
-    android:background="@drawable/appointment_user_profile_background">
+    android:background="@color/Page_background"
+    tools:context=".fragment.PatientFragment">
 
 
     <android.support.v7.widget.CardView
         android:id="@+id/card_view_show_appointment"
-        style="@style/MyCardViewStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        card_view:cardUseCompatPadding="true"
+        android:layout_marginEnd="3dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="16dp"
         card_view:cardCornerRadius="1dp"
         card_view:cardElevation="5dp"
-        android:layout_marginEnd="3dp"
-        card_view:layout_constraintRight_toRightOf="parent"
-        android:layout_marginStart="3dp"
+        card_view:contentPadding="10dp"
+        card_view:cardBackgroundColor="@color/white"
+        card_view:cardUseCompatPadding="true"
         card_view:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="16dp"
+        card_view:layout_constraintRight_toRightOf="parent"
         card_view:layout_constraintTop_toTopOf="parent">
+
         <TextView
             android:id="@+id/appointment_doctor_name"
             android:layout_width="match_parent"
@@ -29,6 +31,38 @@
             android:layout_marginStart="10dp"
             android:text="Appointments"
             android:textSize="20sp"
+            android:textColor="@color/Black"
             android:textStyle="bold" />
     </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view_post_healthTips"
+        card_view:contentPadding="10dp"
+        card_view:cardBackgroundColor="@color/white"
+        android:layout_width="0dp"
+        android:visibility="visible"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="3dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="8dp"
+        card_view:cardCornerRadius="1dp"
+        card_view:cardElevation="5dp"
+        card_view:cardUseCompatPadding="true"
+        card_view:layout_constraintLeft_toLeftOf="parent"
+        card_view:layout_constraintTop_toBottomOf="@+id/card_view_show_appointment"
+        card_view:layout_constraintRight_toRightOf="parent">
+
+        <TextView
+            android:id="@+id/post_healthTips"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="10dp"
+            android:text="Post Health Tips"
+            android:textSize="20sp"
+            android:textColor="@color/Black"
+            android:textStyle="bold" />
+    </android.support.v7.widget.CardView>
+
+
 </android.support.constraint.ConstraintLayout>

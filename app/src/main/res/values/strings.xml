@@ -69,6 +69,11 @@
     <string name="about_ok">OK</string>
 
     <string name="changelog_body">
+        <b><u>PM 2.4 - Changes:</u></b>\n
+
+        &#8226; Some Major UI Changes here and There. \n
+        &#8226; layout Fixes for Small Screen devices. \n
+        &#8226; Bug Fixes and Improvements \n\n
 
         <b><u>PM 2.3 - Changes:</u></b>\n
 

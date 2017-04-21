@@ -43,6 +43,8 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".activity.PatientProfile"
             android:screenOrientation="portrait"/>
+        <activity android:name=".activity.Post_Health_Tips"
+            android:screenOrientation="portrait"/>
 
 
     </application>

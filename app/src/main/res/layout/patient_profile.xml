@@ -42,7 +42,7 @@
 
                 <TextView
                     android:id="@+id/patient_profile_name"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
 
                     android:layout_marginEnd="8dp"
@@ -50,6 +50,7 @@
                     android:layout_marginTop="8dp"
                     android:shadowColor="@color/Black"
                     android:text="Name"
+                    android:textAlignment="center"
                     android:textColor="@color/Black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -59,7 +60,7 @@
 
                 <TextView
                     android:id="@+id/patient_profile_email"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_marginLeft="8dp"
@@ -67,8 +68,10 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:text="Email"
+                    android:textAlignment="center"
                     android:textColor="#E91E63"
                     android:textSize="16sp"
+                    app:layout_constraintHorizontal_bias="0.501"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/patient_profile_name" />
@@ -95,7 +98,7 @@
 
                 <TextView
                     android:id="@+id/patient_profile_phone"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_marginLeft="8dp"
@@ -103,8 +106,10 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:text="Phone"
+                    android:textAlignment="center"
                     android:textColor="#E91E63"
                     android:textSize="16sp"
+                    app:layout_constraintHorizontal_bias="0.501"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/patient_profile_email" />
@@ -160,13 +165,14 @@
 
                 <TextView
                     android:id="@+id/patient_profile_address"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="16dp"
+                    android:singleLine="false"
                     android:text="@string/demo"
                     android:textColor="@color/colorPrimary"
                     android:textStyle="bold"

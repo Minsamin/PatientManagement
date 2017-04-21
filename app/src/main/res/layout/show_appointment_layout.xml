@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/appointment_user_profile_background"
+    android:background="@color/Page_background"
     android:orientation="vertical"
     tools:context="com.example.samin.paitientmanagement.activity.Show_Appointments">
 
@@ -12,16 +12,24 @@
             android:id="@+id/show_appointment_appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#009688">
+            android:background="@color/colorPrimary">
         </android.support.v7.widget.Toolbar>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/show_appointment_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
                 android:layout_marginBottom="2dp"/>
+    <ImageView
+        android:id="@+id/no_data_available_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/no_appoinment"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:contentDescription="@string/desc" />
 
     <ProgressBar
         android:id="@+id/progressBar3"

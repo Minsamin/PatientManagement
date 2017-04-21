@@ -85,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog.Builder builder;
     String check;
     String version;
-    public static String app_user_type,LoggedIn_User_Email;
+    public static String app_user_type = "null",LoggedIn_User_Email;
+
 
 
     @Override
@@ -123,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setItemIconTintList(null);
+
+
         // fab = (FloatingActionButton) findViewById(R.id.fab);
 
         // Navigation view header
@@ -376,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        navigationView.getMenu().getItem(6).setActionView(R.layout.menu_dot);
+        navigationView.getMenu().getItem(7).setActionView(R.layout.menu_dot);
 
 
         // final String version = BuildConfig.VERSION_NAME;

@@ -190,50 +190,11 @@ public class AppointmentFragment extends Fragment {
         };
 
 
-//        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-//            @Override
-//            public void onItemRangeInserted(int positionStart, int itemCount) {
-//                Log.d("LOGGED", "registerAdapterDataObserver Called: ");
-//                super.onItemRangeInserted(positionStart, itemCount);
-//                int friendlyMessageCount = mFirebaseAdapter.getItemCount();
-//
-//                int lastVisiblePosition =
-//                        mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
-//                // If the recycler view is initially being loaded or the
-//                // user is at the bottom of the list, scroll to the bottom
-//                // of the list to show the newly added message.
-//                if (lastVisiblePosition == -1 ||
-//                        (positionStart >= (friendlyMessageCount - 1) &&
-//                                lastVisiblePosition == (positionStart - 1))) {
-//                    Log.d("LOGGED", "IF  registerAdapterDataObserver Called: ");
-//                    recyclerView.scrollToPosition(positionStart);
-//                }
-//            }
-//        });
+
 
 //        //Log.d("LOGGED", "setAdapter Called: ");
         recyclerView.setAdapter(mFirebaseAdapter);
-//       // Log.d("LOGGED", "populateViewHolder Exit: ");
-//
-//        if(recyclerView.isActivated())
-//        {
-//            Log.d("LOGGED", "recyclerView is Activated : ");
-//        }
-//
-//        if(recyclerView.isShown())
-//        {
-//            Log.d("LOGGED", "recyclerView is Shown : ");
-//        }
-//
-//        if(recyclerView.isAttachedToWindow())
-//        {
-//            Log.d("LOGGED", "recyclerView is Attached To Window : ");
-//        }
-//
-//        if(recyclerView.isFocused())
-//        {
-//            Log.d("LOGGED", "recyclerView is Focused: ");
-//        }
+
     }
 
 //    @Override
@@ -261,7 +222,7 @@ public class AppointmentFragment extends Fragment {
 //    }
 
     //View Holder For Recycler View
-    private static class DoctorDetailsViewHolder extends RecyclerView.ViewHolder {
+    public static class DoctorDetailsViewHolder extends RecyclerView.ViewHolder {
         private final TextView doctor_name, doctor_chamber, doctor_specialization;
         private final ImageView doctor_image;
 
@@ -290,12 +251,12 @@ public class AppointmentFragment extends Fragment {
 
         private void Doctor_Image_URL(String url) {
 
-            if (url != null) {
+            if (!url.equals("Null")) {
 //                Picasso.with(itemView.getContext())
 //                        .load(url)
 //                        .placeholder(R.drawable.loading)
 //                        .into(doctor_image);
-                Log.d("LOGGED", "Setting Image: ");
+                Log.d("LOGGED", "Setting Image: " +url);
 
                 Glide.with(itemView.getContext())
                         .load(url)
@@ -313,7 +274,6 @@ public class AppointmentFragment extends Fragment {
                         .load(R.drawable.invalid_person_image)
                         .crossFade()
                         .thumbnail(0.5f)
-                        .placeholder(R.drawable.loading)
                         .bitmapTransform(new CircleTransform(itemView.getContext()))
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(doctor_image);

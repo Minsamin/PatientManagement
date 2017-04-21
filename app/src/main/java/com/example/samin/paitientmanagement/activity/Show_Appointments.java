@@ -3,12 +3,15 @@ package com.example.samin.paitientmanagement.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
+import android.support.transition.Visibility;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +27,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.samin.paitientmanagement.R;
 import com.example.samin.paitientmanagement.fragment.PathologyLabsFragment;
+import com.example.samin.paitientmanagement.other.CircleTransform;
 import com.example.samin.paitientmanagement.other.Show_appointment_data_item;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -53,12 +57,14 @@ public class Show_Appointments extends AppCompatActivity {
     //Boolean flag=false;
     ProgressBar progressBar;
     int Select_Layout;
+    ImageView noDataAvailableImage;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.show_appointment_layout);
+        noDataAvailableImage = (ImageView)findViewById(R.id.no_data_available_image);
 
         //ToolBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.show_appointment_appBarLayout);
@@ -66,7 +72,9 @@ public class Show_Appointments extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("Your Appointments");
+            //actionBar.setTitle("Your Appointments");
+            actionBar.setTitle(Html.fromHtml("<font color=#FFFFFF>" + "Your Appointments" + "</font>"));
+
         }
        // Log.d("LOGGED", "----------------------- START NEW --------------------------");
 
@@ -92,6 +100,12 @@ public class Show_Appointments extends AppCompatActivity {
         progressBar.setVisibility(ProgressBar.VISIBLE);
     }
 
+
+
+
+
+
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -110,7 +124,7 @@ public class Show_Appointments extends AppCompatActivity {
 //                return super.onCreateViewHolder(view, viewType);
 //            }
                 public void populateViewHolder(final MyViewHolder viewHolder, Show_appointment_data_item model, final int position) {
-                    progressBar.setVisibility(ProgressBar.INVISIBLE);
+                    //progressBar.setVisibility(ProgressBar.INVISIBLE);
                     //flag = true;
                     viewHolder.setDoctor_URL(model.getAppointment_Doctor_Email());
                     viewHolder.setAppointment_Doctor_Name(model.getAppointment_Doctor_Name());
@@ -155,16 +169,62 @@ public class Show_Appointments extends AppCompatActivity {
 
                 }
             };
-    }
+            //Log.d("LOGGED", "Setting Adapter ");
+            recyclerView.setAdapter(mFirebaseAdapter);
+
+
+            myRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+                @Override
+                public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                    Log.d("LOGGED", "I Called Yahoo ");
+                    if(dataSnapshot.hasChildren())
+                    {
+                        //Log.d("LOGGED", "Boolean value true: ");
+                        progressBar.setVisibility(ProgressBar.INVISIBLE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        progressBar.setVisibility(ProgressBar.INVISIBLE);
+                        recyclerView.setVisibility(View.INVISIBLE);
+                        noDataAvailableImage.setVisibility(View.VISIBLE);
+                        Toast.makeText(Show_Appointments.this, "Data Unavailable", Toast.LENGTH_SHORT).show();
+                        //Log.d("LOGGED", "Boolean value false: ");
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+        }
+
+
+
+
+
 
         else if (MainActivity.app_user_type.equals("Doctor"))
         {
             mFirebaseAdapter = new FirebaseRecyclerAdapter<Show_appointment_data_item, MyViewHolder>(Show_appointment_data_item.class, R.layout.show_appointment_single_item_doctor, MyViewHolder.class, myRef2) {
 
+
+                @Override
+                public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+                    Log.d("LOGGED", "onCreateViewHolder: Called ");
+                    return super.onCreateViewHolder(parent, viewType);
+
+
+                }
+
                 public void populateViewHolder(final MyViewHolder viewHolder, Show_appointment_data_item model, final int position) {
                     //flag = true;
 
-                    progressBar.setVisibility(ProgressBar.INVISIBLE);
+                    //progressBar.setVisibility(ProgressBar.INVISIBLE);
 
                    // viewHolder.setDoctor_URL(model.getAppointment_Doctor_Email());
                     //viewHolder.setAppointment_Doctor_Name(model.getAppointment_Doctor_Name());
@@ -178,6 +238,7 @@ public class Show_Appointments extends AppCompatActivity {
                     final String DOCTOR_EMAIL = model.getAppointment_Doctor_Email();
                     viewHolder.setPatient_Image(model.getPatient_Email());
                     viewHolder.setAppointment_Request_Status_doctor(model.getRequest_Status());
+
 
                     //Log.d("LOGGED", "populateViewHolder: Called ");
                     viewHolder.mView.setOnClickListener(new View.OnClickListener() {
@@ -311,21 +372,52 @@ public class Show_Appointments extends AppCompatActivity {
                     });
                 }
             };
+            //Log.d("LOGGED", "Setting Adapter ");
+            recyclerView.setAdapter(mFirebaseAdapter);
+
+            myRef2.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+                @Override
+                public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                    //Log.d("LOGGED", "I Called Yahoo ");
+                    if(dataSnapshot.hasChildren())
+                    {
+                        //Log.d("LOGGED", "Boolean value true: ");
+                        progressBar.setVisibility(ProgressBar.INVISIBLE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        progressBar.setVisibility(ProgressBar.INVISIBLE);
+                        recyclerView.setVisibility(View.INVISIBLE);
+                        noDataAvailableImage.setVisibility(View.VISIBLE);
+                        Toast.makeText(Show_Appointments.this, "Data Unavailable", Toast.LENGTH_SHORT).show();
+                        //Log.d("LOGGED", "Boolean value false: ");
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
         }
-        //Log.d("LOGGED", "Setting Adapter ");
-        recyclerView.setAdapter(mFirebaseAdapter);
     }
+
+
+
+
+
+
 
     public void call2nd(String Patient_EmailID, final String Doctors_Approval_Tracking)
     {
         myRef4= root_Ref.child("User_Appointment").child(Patient_EmailID);
 
 
-        Log.d("LOGGED", "Patient_EmailID " + Patient_EmailID);
-        Log.d("LOGGED", "Doctors_Approval_Tracking " + Doctors_Approval_Tracking);
-        Log.d("LOGGED", "RootRef " + myRef4);
-
-
+//        Log.d("LOGGED", "Patient_EmailID " + Patient_EmailID);
+//        Log.d("LOGGED", "Doctors_Approval_Tracking " + Doctors_Approval_Tracking);
+//        Log.d("LOGGED", "RootRef " + myRef4);
 
         myRef4.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
             @Override
@@ -365,6 +457,13 @@ public class Show_Appointments extends AppCompatActivity {
         });
     }
 
+
+
+
+
+
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -389,15 +488,26 @@ public class Show_Appointments extends AppCompatActivity {
         }
     }
 
+
+
+
+
+
+
+
+
     //View Holder For Recycler View
-    private static class MyViewHolder extends RecyclerView.ViewHolder {
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
         private final TextView post_doctor_name, post_doctor_email, post_doctor_phone, post_patient_name, post_patient_phone, post_appointment_date, post_appointment_reason;
         private final ImageView post_doctor_image,post_appointment_status,post_appointment_status_doctor;
         View mView;
         Firebase mRoofRef;
+        RecyclerView.ViewHolder vv;
 
         public MyViewHolder(final View itemView) {
+
             super(itemView);
+            Log.d("LOGGED", "ViewHolder Called: " );
             mView = itemView;
             post_doctor_name = (TextView) mView.findViewById(R.id.fetch_doctor_name);
             post_doctor_email = (TextView) mView.findViewById(R.id.fetch_doctor_email);
@@ -409,7 +519,10 @@ public class Show_Appointments extends AppCompatActivity {
             post_doctor_image = (ImageView) mView.findViewById(R.id.show_appointment_doctor_image);
             post_appointment_status = (ImageView) mView.findViewById(R.id.fetch_doctor_approval);
             post_appointment_status_doctor = (ImageView) mView.findViewById(R.id.show_appointment_appointment_status);
+
         }
+
+
 
         private void setAppointment_Doctor_Name(String title) {
             post_doctor_name.setText(title);
@@ -507,10 +620,12 @@ public class Show_Appointments extends AppCompatActivity {
 //                                .placeholder(R.drawable.loading)
 //                                .into(post_doctor_image);
 
-                        Glide.with(itemView.getContext()).load(retrieve_url)
+                        Glide.with(itemView.getContext())
+                                .load(retrieve_url)
                                 .crossFade()
                                 .placeholder(R.drawable.invalid_person_image)
-                                .thumbnail(0.1f)
+                                .thumbnail(0.5f)
+                                .bitmapTransform(new CircleTransform(itemView.getContext()))
                                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .into(post_doctor_image);
                     }
