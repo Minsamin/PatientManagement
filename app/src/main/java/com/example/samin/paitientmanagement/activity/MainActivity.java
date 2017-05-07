@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,14 +39,18 @@ import com.example.samin.paitientmanagement.fragment.ProfileFragment;
 import com.example.samin.paitientmanagement.fragment.ProfileFragment_Doctor;
 import com.example.samin.paitientmanagement.fragment.SettingsFragment;
 import com.example.samin.paitientmanagement.other.CircleTransform;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.onesignal.OSNotificationAction;
+import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
-import java.util.Map;
+
+import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -55,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imgNavHeaderBg, imgProfile;
     private TextView txtName, txtWebsite;
     private Toolbar toolbar;
-    //private FloatingActionButton fab;
     // index to identify current nav menu item
     public static int navItemIndex = 0;
 
@@ -78,21 +82,33 @@ public class MainActivity extends AppCompatActivity {
     //private boolean shouldLoadHomeFragOnBackPress = true;
     private Handler mHandler;
     private FirebaseAuth firebaseAuth;
-    Firebase mRoofRef;
+    DatabaseReference mRoofRef;
     FirebaseUser user;
+    private static FirebaseDatabase mDatabase;
+
 
     static public String UserID,MainActivityLoaded;
     AlertDialog.Builder builder;
     String check;
     String version;
     public static String app_user_type = "null",LoggedIn_User_Email;
+    private boolean isInForeground=false;
+
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OneSignal.startInit(this).init();
+
+
+
+        OneSignal.startInit(this)
+                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                .setNotificationOpenedHandler(new NotificationOpenedHandler())
+                .init();
+
+
         firebaseAuth = FirebaseAuth.getInstance();
         if(firebaseAuth.getCurrentUser() == null)
         {
@@ -100,6 +116,16 @@ public class MainActivity extends AppCompatActivity {
             finish();
             startActivity(new Intent(getApplicationContext(),login_activity.class));
         }
+
+            if (mDatabase == null) {
+                mDatabase = FirebaseDatabase.getInstance();
+                //mDatabase.setPersistenceEnabled(true);
+                FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            }
+
+
+
+
         MainActivityLoaded = "1";
 
         // SharedPreferences sharedPreferences2 = getSharedPreferences("USER_DESIGNATION", MODE_PRIVATE);
@@ -120,13 +146,13 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        //drawer = (DrawerLayout) getView().findViewById(R.id.drawer_layout);
+
+
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setItemIconTintList(null);
 
-
-        // fab = (FloatingActionButton) findViewById(R.id.fab);
 
         // Navigation view header
         navHeader = navigationView.getHeaderView(0);
@@ -142,15 +168,12 @@ public class MainActivity extends AppCompatActivity {
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
 
-
-        mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
-
+        //mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
+        mRoofRef = FirebaseDatabase.getInstance().getReference().child("User_Details").child(UserID);
+        mRoofRef.keepSynced(true);
 
         loadNavHeader();
         setUpNavigationView();
-
-
-
 
 
 
@@ -207,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Log.d("LOGGED", "CHECKING BUILD VERSION_NAME : ");
 
+
         version = BuildConfig.VERSION_NAME;
         //Shared Preference
         /**
@@ -216,8 +240,6 @@ public class MainActivity extends AppCompatActivity {
          */
         SharedPreferences sharedPreferences = getSharedPreferences("Update", MODE_PRIVATE);
         check =sharedPreferences.getString("update_later",version);
-
-
 
 
 
@@ -262,8 +284,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
         mHandler = new Handler();
         // Log.d("LOGGED", "I waited ");
 
@@ -272,7 +292,14 @@ public class MainActivity extends AppCompatActivity {
             navItemIndex = 0;
             CURRENT_TAG = TAG_HOME;
             loadHomeFragment();
+
+            if ( getIntent() != null && (getIntent().getFlags() & Intent.FLAG_ACTIVITY_REORDER_TO_FRONT) != 0) {
+                navItemIndex = 7;
+                CURRENT_TAG = TAG_NOTIFICATIONS;
+                loadHomeFragment();
+            }
         }
+
 
 
         imgProfile.setOnClickListener(new View.OnClickListener() {
@@ -285,11 +312,59 @@ public class MainActivity extends AppCompatActivity {
         });
 
        // Log.d("LOGGED", "ON CREATE COMPLETED : ");
+
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        final DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
 
 
 
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 100ms
+                connectedRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        final boolean connected = snapshot.getValue(Boolean.class);
+                        Log.d("LOGGED", "ON CREATE snapshot : " + snapshot.toString());
+                        if (connected && isInForeground)
+                        {
+                           // Toast.makeText(getApplicationContext(), "Connected !", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            if(isInForeground)
+                                Toast.makeText(getApplicationContext(), "Internet Unavailable !", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        System.err.println("Listener was cancelled");
+                    }
+                });
+
+            }
+        }, 4000);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isInForeground = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isInForeground = false;
+    }
 
     private void loadNavHeader() {
 
@@ -306,25 +381,36 @@ public class MainActivity extends AppCompatActivity {
         txtName.setText("Welcome,");
 
 
-        mRoofRef.addValueEventListener(new ValueEventListener() {
+
+        mRoofRef.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+//                Log.d("LOGGED", "dataSnapshot: " +dataSnapshot);
+//                Log.d("LOGGED", "dataSnapshot get Key: " +dataSnapshot.getKey());
+//                Log.d("LOGGED", "dataSnapshot get Value: " +dataSnapshot.getValue());
 
-                Map<String, String> map = dataSnapshot.getValue(Map.class);
+                String retrieve_name = dataSnapshot.child("Name").getValue(String.class);
+                String retrieve_url = dataSnapshot.child("Image_URL").getValue(String.class);
+                String retrieve_type = dataSnapshot.child("User_Type").getValue(String.class);
 
-                String retrieve_name = map.get("Name");
-                String retrieve_url = map.get("Image_URL");
-                String retrieve_type = map.get("User_Type");
+
+
+
+
+                Log.d("LOGGED", "User_Type: " +retrieve_type);
+                //HomeFragment hm = new HomeFragment();
 
                 drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 if(retrieve_type.equals("Doctor"))
                 {
                     Toast.makeText(MainActivity.this, "Welcome  !! ", Toast.LENGTH_SHORT).show();
-                   // Log.d("LOGGED", "I AM A DOCTOR: ");
+                    // Log.d("LOGGED", "I AM A DOCTOR: ");
                     navigationView.getMenu().getItem(1).setVisible(false);
                     //navigationView.getMenu().getItem(2).setVisible(true);
                     navigationView.getMenu().getItem(3).setVisible(false);
                     app_user_type = "Doctor";
+
+                    //hm.get_started_button.setText("Lets Get Started !");
                 }
                 if(retrieve_type.equals("Patient"))
                 {
@@ -333,6 +419,7 @@ public class MainActivity extends AppCompatActivity {
                     navigationView.getMenu().getItem(2).setVisible(false);
                     //navigationView.getMenu().getItem(3).setVisible(true);
                     Toast.makeText(MainActivity.this, "Welcome  !! ", Toast.LENGTH_SHORT).show();
+                   // hm.get_started_button.setText("Lets Get Started !");
 
 
                 }
@@ -372,25 +459,34 @@ public class MainActivity extends AppCompatActivity {
                     }
                     //Log.d("LOGGED", "IMAGE SET IN - - LOAD NAV HEADER   : ");
                 }
+
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {   }
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w("TAGGED", "loadPost:onCancelled", databaseError.toException());
+            }
         });
-
 
         navigationView.getMenu().getItem(7).setActionView(R.layout.menu_dot);
 
 
         // final String version = BuildConfig.VERSION_NAME;
-        mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/Update_APK");
-        mRoofRef.addListenerForSingleValueEvent(new ValueEventListener() {
+       // mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/Update_APK");
+        mRoofRef = FirebaseDatabase.getInstance().getReference().child("Update_APK");
+
+
+
+        mRoofRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, String> map = dataSnapshot.getValue(Map.class);
-                final String retrieve_url = map.get("Download_URL");
-                final String retrieve_version = map.get("Version");
-                final String retrieve_changelog = map.get("Changelog");
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                //System.out.println(dataSnapshot.getValue());
+                //Map<String, String> map = dataSnapshot.getValue(Map.class);
+               // Map<String,String> map = (Map<String, String>) dataSnapshot.getValue();
+
+              final String retrieve_url = dataSnapshot.child("Download_URL").getValue(String.class);
+              final String retrieve_version = dataSnapshot.child("Version").getValue(String.class);
+              final String retrieve_changelog = dataSnapshot.child("Changelog").getValue(String.class);
 
                 //Log.d("LOGGED", "UPDATE CHECKING - - LOAD NAV HEADER   : ");
 
@@ -434,14 +530,18 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w("TAGGED", "loadPost:onCancelled", databaseError.toException());
             }
         });
-
-
     }
 
+
+    //Open Navigation Drawer From Home Fragment
+    public void openDrawer(){
+        //drawer.openDrawer(drawer);
+        drawer.openDrawer(Gravity.START);
+    }
     /***
      * Returns respected fragment that user
      * selected from navigation menu
@@ -543,7 +643,7 @@ public class MainActivity extends AppCompatActivity {
         navigationView.getMenu().getItem(navItemIndex).setChecked(true);
     }
 
-    private void setUpNavigationView() {
+    public void setUpNavigationView() {
         //Log.d("LOGGED", "SET UP NAVIGATION VIEW CALLED   : ");
         //Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -844,11 +944,45 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // show or hide the fab
-//    private void toggleFab() {
-//        if (navItemIndex == 0)
-//            fab.show();
-//        else
-//            fab.hide();
-//    }
+
+    public class NotificationOpenedHandler implements OneSignal.NotificationOpenedHandler {
+        // This fires when a notification is opened by tapping on it.
+        @Override
+        public void notificationOpened(OSNotificationOpenResult result) {
+//            OSNotificationAction.ActionType actionType = result.action.type;
+//            JSONObject data = result.notification.payload.additionalData;
+//            String customKey="NULL";
+//
+//            Log.d("LOGGED", "JSONObject data: " + data);
+//
+//            if (data != null) {
+//                customKey = data.optString("customkey", null);
+//                if (customKey != null)
+//                    Log.i("OneSignalExample", "customkey set with value: " + customKey);
+//            }
+//            Log.d("LOGGED", "JSONObject data: " + data);
+//            Log.d("LOGGED", "customKey data: " + customKey);
+//            Log.d("LOGGED", "actionType data: " + actionType);
+//
+//            if (actionType == OSNotificationAction.ActionType.ActionTaken)
+//                Log.i("OneSignalExample", "Button pressed with id: " + result.action.actionID);
+            // The following can be used to open an Activity of your choice.
+            // Replace - getApplicationContext() - with any Android Context.
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+    }
 }
+
+
+
+
+
+        // Add the following to your AndroidManifest.xml to prevent the launching of your main Activity
+        //   if you are calling startActivity above.
+
+        //<application ...>
+       //   <meta-data android:name="com.onesignal.NotificationOpened.DEFAULT" android:value="DISABLE" />
+      //  </application>
+

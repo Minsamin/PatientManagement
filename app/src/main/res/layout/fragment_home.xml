@@ -226,7 +226,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="32dp"
             android:background="@color/colorPrimary"
-            android:text="Lets Get Started !"
+            android:text="WAIT..."
             android:textColor="@color/white"
             custom:layout_constraintLeft_toLeftOf="parent"
             custom:layout_constraintRight_toRightOf="parent"

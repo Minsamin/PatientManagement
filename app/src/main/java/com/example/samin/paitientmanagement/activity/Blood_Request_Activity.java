@@ -9,9 +9,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.samin.paitientmanagement.R;
-import com.firebase.client.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 /*
  * Created by Samin on 08-03-2017.
@@ -67,13 +68,15 @@ public class Blood_Request_Activity extends AppCompatActivity {
 
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 UserID=user.getEmail().replace("@","").replace(".","");
-                Firebase mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/");
-                Firebase userRef = mRoofRef.child("Blood_Request").push();
-                userRef.child("Person_Name").setValue(getName);
-                userRef.child("Person_Phone").setValue(getPhone);
-                userRef.child("Person_Address").setValue(getAddress);
-                userRef.child("Person_Email").setValue(UserID);
-                userRef.child("Person_Request_blood_group").setValue(getBlood_Group);
+               // Firebase mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/");
+                DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child("Blood_Request").push();
+                //Firebase userRef = mRoofRef.child("Blood_Request").push();
+
+                mRootRef.child("Person_Name").setValue(getName);
+                mRootRef.child("Person_Phone").setValue(getPhone);
+                mRootRef.child("Person_Address").setValue(getAddress);
+                mRootRef.child("Person_Email").setValue(UserID);
+                mRootRef.child("Person_Request_blood_group").setValue(getBlood_Group);
 
                 Toast.makeText(getApplicationContext(), "Request Registered", Toast.LENGTH_SHORT).show();
 

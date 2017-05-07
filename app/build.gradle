@@ -15,7 +15,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 25
         versionCode 1
-        versionName "2.4"
+        versionName "2.6"
 
         manifestPlaceholders = [onesignal_app_id: "d0bb9a8d-ae7a-4eef-b4f1-4b7b40992263",
                                 // Project number pulled from dashboard, local value is ignored.
@@ -26,10 +26,14 @@ android {
         release {
             //minify is an Android tool that will decrease the size of your application when you go to build it.
             minifyEnabled true
-
             //To use shrinkResources, you must enable code shrinking. During the build process, first ProGuard removes unused code but leaves unused resources. Then Gradle removes the unused resources.
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            //Gives me Picasso and OkHTTP ERROR
+            //minifyEnabled true
+
         }
     }
 
@@ -44,8 +48,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-
-    compile 'com.android.support:palette-v7:25.3.1'
+    //compile 'com.android.support:palette-v7:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.android.support:cardview-v7:25.3.1'
@@ -54,30 +57,28 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.firebase:firebase-auth:10.2.1'
     compile 'com.google.firebase:firebase-database:10.2.1'
-    compile 'com.firebase:firebase-client-android:2.4.0'
+
     compile 'com.google.firebase:firebase-storage:10.2.1'
     // FirebaseUI Database only
     compile 'com.firebaseui:firebase-ui-database:1.2.0'
     // FirebaseUI Storage only
-    compile 'com.firebaseui:firebase-ui-storage:1.2.0'
-    compile 'com.google.firebase:firebase-core:10.2.1'
+    //compile 'com.firebaseui:firebase-ui-storage:1.2.0'
+
+
+    //compile 'com.google.firebase:firebase-core:10.2.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
+
     compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.onesignal:OneSignal:3.4.3@aar'
+    compile 'com.onesignal:OneSignal:3.4.4@aar'
     // Required for OneSignal, even if you have added FCM.
     compile 'com.google.android.gms:play-services-gcm:10.2.1'
     // Required for geotagging
     compile 'com.google.android.gms:play-services-location:10.2.1'
     // play-services-analytics is only needed when using 8.1.0 or older.
     // compile 'com.google.android.gms:play-services-analytics:+'
-
-
     compile 'com.github.vipulasri:timelineview:1.0.5'
-
-
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.daimajia.slider:library:1.1.5@aar'
-
 }
 apply plugin: 'com.google.gms.google-services'

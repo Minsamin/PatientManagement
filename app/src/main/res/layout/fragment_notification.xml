@@ -1,13 +1,31 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.samin.paitientmanagement.fragment.NotificationFragment">
+    android:background="@color/Page_background"
+    android:orientation="vertical">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/show_notification_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="2dp"/>
+    <ImageView
+        android:id="@+id/no_data_available_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="NOTHING" />
+        android:src="@drawable/no_appoinment"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:contentDescription="@string/desc" />
 
-</FrameLayout>
+    <ProgressBar
+        android:id="@+id/progressBar3"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_height="wrap_content" />
+</LinearLayout>
+

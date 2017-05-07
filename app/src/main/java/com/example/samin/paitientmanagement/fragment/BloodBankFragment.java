@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.samin.paitientmanagement.R;
+import com.example.samin.paitientmanagement.activity.Blood_Banks_Page;
 import com.example.samin.paitientmanagement.activity.Blood_Request_Activity;
 import com.example.samin.paitientmanagement.activity.Show_Appointments;
 import com.example.samin.paitientmanagement.activity.Show_blood_request;
@@ -63,7 +64,9 @@ public class BloodBankFragment extends Fragment {
         blood_banks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Not Implemented Yet", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), "Not Implemented Yet", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(getContext(), Blood_Banks_Page.class);
+                getContext().startActivity(i);
             }
         });
 

@@ -54,13 +54,11 @@ public class AppointmentFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+       // FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         firebaseDatabase = FirebaseDatabase.getInstance();
         myRef = firebaseDatabase.getReference("Doctor_Detais");
-        //progressBar = new ProgressBar(getContext());
-//        if(flag)
-//            Toast.makeText(getContext(), "Wait !  Fetching List...", Toast.LENGTH_SHORT).show();
-//        flag=false;
-        Log.d("LOGGED", "onCreate Called : ");
+        myRef.keepSynced(true);
+        Toast.makeText(getContext(), "Wait !  Fetching List...", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -79,7 +77,7 @@ public class AppointmentFragment extends Fragment {
         //mLinearLayoutManager.setStackFromEnd(true);
 
         recyclerView.setLayoutManager(mLinearLayoutManager);
-        Log.d("LOGGED", "onCreateView Called : ");
+        //Log.d("LOGGED", "onCreateView Called : ");
 
         //recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -113,6 +111,7 @@ public class AppointmentFragment extends Fragment {
 
             }
         });
+
         return v;
     }
 
@@ -123,10 +122,10 @@ public class AppointmentFragment extends Fragment {
         progressBar.setVisibility(ProgressBar.VISIBLE);
         if(MainActivityLoaded.equals("1"))
         {
-            Toast.makeText(getContext(), "Wait !  Fetching List...", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), "Wait !  Fetching List...", Toast.LENGTH_SHORT).show();
             MainActivityLoaded = "0";
         }
-        Log.d("LOGGED", "Will Start Calling populateViewHolder : ");
+        //Log.d("LOGGED", "Will Start Calling populateViewHolder : ");
         //Log.d("LOGGED", "IN onStart ");
         mFirebaseAdapter = new FirebaseRecyclerAdapter<DoctorDetails, DoctorDetailsViewHolder>(DoctorDetails.class, R.layout.card_doctor_layout, DoctorDetailsViewHolder.class, myRef) {
 
@@ -154,18 +153,18 @@ public class AppointmentFragment extends Fragment {
                             public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
                                 Intent intent = new Intent(getContext(), PersonalInfo.class);
 
-                                GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {};
-                                Map<String, String> map = dataSnapshot.getValue(genericTypeIndicator );
+                                //GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {};
+                                //Map<String, String> map = dataSnapshot.getValue(genericTypeIndicator );
 
-                                String retrieve_name = map.get("Name");
-                                String retrieve_phone = map.get("Phone");
-                                String retrieve_Email = map.get("Email");
-                                String retrieve_url = map.get("Image_URL");
-                                String retrieve_Specialization = map.get("Specialization");
-                                String retrieve_Experience = map.get("Experience");
-                                String retrieve_Chamber = map.get("Chamber");
-                                String retrieve_Timing = map.get("Timing");
-                                String retrieve_Fees = map.get("Fees");
+                                String retrieve_name = dataSnapshot.child("Name").getValue(String.class);
+                                String retrieve_phone = dataSnapshot.child("Phone").getValue(String.class);
+                                String retrieve_Email = dataSnapshot.child("Email").getValue(String.class);
+                                String retrieve_url = dataSnapshot.child("Image_URL").getValue(String.class);
+                                String retrieve_Specialization = dataSnapshot.child("Specialization").getValue(String.class);
+                                String retrieve_Experience = dataSnapshot.child("Experience").getValue(String.class);
+                                String retrieve_Chamber = dataSnapshot.child("Chamber").getValue(String.class);
+                                String retrieve_Timing = dataSnapshot.child("Timing").getValue(String.class);
+                                String retrieve_Fees = dataSnapshot.child("Fees").getValue(String.class);
 
                                 intent.putExtra("image_id",retrieve_url);
                                 intent.putExtra("email",retrieve_Email);
@@ -228,7 +227,7 @@ public class AppointmentFragment extends Fragment {
 
         public DoctorDetailsViewHolder(final View itemView) {
             super(itemView);
-            Log.d("LOGGED", "View Holder Called: ");
+           // Log.d("LOGGED", "View Holder Called: ");
             doctor_name = (TextView) itemView.findViewById(R.id.appointment_doctor_name);
             doctor_chamber = (TextView) itemView.findViewById(R.id.appointment_doctor_chamber);
             doctor_image = (ImageView) itemView.findViewById(R.id.appointment_doctor_image);
@@ -256,7 +255,7 @@ public class AppointmentFragment extends Fragment {
 //                        .load(url)
 //                        .placeholder(R.drawable.loading)
 //                        .into(doctor_image);
-                Log.d("LOGGED", "Setting Image: " +url);
+               // Log.d("LOGGED", "Setting Image: " +url);
 
                 Glide.with(itemView.getContext())
                         .load(url)

@@ -33,14 +33,19 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class HomeFragment extends Fragment implements BaseSliderView.OnSliderClickListener, ViewPagerEx.OnPageChangeListener{
     Button notification;
     //private Handler mHandler;
+    private DrawerLayout drawer;
 
     TextView heading1,heading2,tv_1,tv_2,tv_3,tv_4,tv_5,tv_6;
     private SliderLayout mDemoSlider;
-    Button get_started_button;
+    public Button get_started_button;
     //private DrawerLayout drawer;
     public HomeFragment() {
         // Required empty public constructor
@@ -50,7 +55,6 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -58,34 +62,12 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v;
-//    if(MainActivity.user_designation=="Doctor")
-//         v = inflater.inflate(R.layout.fragment_notification, container, false);
-//        else
-         v = inflater.inflate(R.layout.fragment_home, container, false);
-        //notification= (Button)v.findViewById(R.id.notification_test);
 
-//        heading1=(TextView)v.findViewById(R.id.tv_heading1);
-//        heading2=(TextView)v.findViewById(R.id.tv_heading2);
-//        tv_1=(TextView)v.findViewById(R.id.tv_text1);
-//        tv_2=(TextView)v.findViewById(R.id.tv_text2);
-//        tv_3=(TextView)v.findViewById(R.id.tv_text3);
-//        tv_4=(TextView)v.findViewById(R.id.tv_text4);
-//        tv_5=(TextView)v.findViewById(R.id.tv_text5);
-//        tv_6=(TextView)v.findViewById(R.id.tv_text6);
-//
-//        Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "fonts/RobotoCondensed-BoldItalic.ttf");
-//        Typeface font2 = Typeface.createFromAsset(getActivity().getAssets(), "fonts/RobotoCondensed-Light.ttf");
-//        heading1.setTypeface(font);
-//        heading2.setTypeface(font);
-//        tv_1.setTypeface(font2);
-//        tv_2.setTypeface(font2);
-//        tv_3.setTypeface(font2);
-//        tv_4.setTypeface(font2);
-//        tv_5.setTypeface(font2);
-//        tv_6.setTypeface(font2);
+         v = inflater.inflate(R.layout.fragment_home, container, false);
+
 
         mDemoSlider = (SliderLayout)v.findViewById(R.id.slider);
-        //drawer = (DrawerLayout) v.findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
         // getActivity().findViewById(R.id.drawer_layout);
 
 //        HashMap<String,String> url_maps = new HashMap<String, String>();
@@ -124,25 +106,40 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
         mDemoSlider.addOnPageChangeListener(this);
 
         get_started_button =(Button)v.findViewById(R.id.get_started_button);
+
+
+        final ScheduledExecutorService executor =
+                Executors.newSingleThreadScheduledExecutor();
+
+        Runnable periodicTask = new Runnable() {
+            public void run() {
+                // Invoke method(s) to do the work
+                //doPeriodicWork();
+                if(MainActivity.app_user_type.equals("Doctor") || MainActivity.app_user_type.equals("Patient")) {
+                    get_started_button.setText("Lets Get Started !");
+                    executor.shutdown();
+                }
+            }
+        };
+
+        executor.scheduleAtFixedRate(periodicTask, 0,1, TimeUnit.SECONDS);
+
+
         get_started_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(MainActivity.app_user_type.equals("Doctor") || MainActivity.app_user_type.equals("Patient"))
-                    Toast.makeText(getContext(), "Swipe from Left-Edge to right !", Toast.LENGTH_SHORT).show();
+                if(MainActivity.app_user_type.equals("Doctor") || MainActivity.app_user_type.equals("Patient")) {
+                    //Toast.makeText(getContext(), "Swipe from Left-Edge to right !", Toast.LENGTH_SHORT).show();
+                    //drawer.openDrawer(null);
+                    ((MainActivity)getActivity()).openDrawer();
+                }
                 else
                     Toast.makeText(getContext(), "Wait...", Toast.LENGTH_SHORT).show();
 
-
-                //drawer.openDrawer(GravityCompat.START);
-                //(MainActivity)getActivity().openDrawer();
             }
         });
 
 
-        //if(MainActivity.app_user_type.equals("Doctor") || MainActivity.app_user_type.equals("Patient"))
-        //{
-            //drawer.openDrawer(drawer);
-       // }
 
 //        ListView l = (ListView)v.findViewById(R.id.transformers);
 //        l.setAdapter(new TransformerAdapter(getContext()));

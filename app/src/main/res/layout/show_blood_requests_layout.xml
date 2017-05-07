@@ -10,7 +10,7 @@
             android:id="@+id/show_blood_request_appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#009688">
+            android:background="@color/colorPrimary">
         </android.support.v7.widget.Toolbar>
 
             <android.support.v7.widget.RecyclerView

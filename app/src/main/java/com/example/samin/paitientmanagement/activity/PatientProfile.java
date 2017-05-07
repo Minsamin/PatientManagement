@@ -169,7 +169,7 @@ public class PatientProfile extends AppCompatActivity {
 
 
 
-    private static class MyViewHolder extends RecyclerView.ViewHolder {
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
         //private final TextView post_doctor_name, post_doctor_email, post_doctor_phone, post_patient_name, post_patient_phone, post_appointment_date, post_appointment_reason;
         //private final ImageView post_doctor_image;
         View mView;

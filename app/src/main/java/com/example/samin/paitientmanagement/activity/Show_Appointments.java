@@ -4,7 +4,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.provider.ContactsContract;
 import android.support.transition.Visibility;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -22,41 +25,34 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.samin.paitientmanagement.R;
-import com.example.samin.paitientmanagement.fragment.PathologyLabsFragment;
 import com.example.samin.paitientmanagement.other.CircleTransform;
 import com.example.samin.paitientmanagement.other.Show_appointment_data_item;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.Query;
-import com.google.firebase.storage.FirebaseStorage;
-
-import java.util.Map;
-import java.util.Objects;
+import com.google.firebase.database.ValueEventListener;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Scanner;
 
 public class Show_Appointments extends AppCompatActivity {
 
-    public FirebaseAuth firebaseAuth;
-    public String UserID;
+    //public FirebaseAuth firebaseAuth;
+    public String UserID,Patient_Email_ID;
     DatabaseReference myRef,myRef2,myRef3,myRef4,root_Ref;
 
     private RecyclerView recyclerView;
     private FirebaseRecyclerAdapter<Show_appointment_data_item, MyViewHolder> mFirebaseAdapter;
     //Boolean flag=false;
     ProgressBar progressBar;
-    int Select_Layout;
     ImageView noDataAvailableImage;
 
 
@@ -74,7 +70,7 @@ public class Show_Appointments extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             //actionBar.setTitle("Your Appointments");
             actionBar.setTitle(Html.fromHtml("<font color=#FFFFFF>" + "Your Appointments" + "</font>"));
-
+           // FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         }
        // Log.d("LOGGED", "----------------------- START NEW --------------------------");
 
@@ -90,7 +86,8 @@ public class Show_Appointments extends AppCompatActivity {
         UserID = MainActivity.LoggedIn_User_Email.replace("@", "").replace(".", "");
         myRef = FirebaseDatabase.getInstance().getReference("User_Appointment").child(UserID);
         myRef2 = FirebaseDatabase.getInstance().getReference("Doctor_Appointment").child(MainActivity.LoggedIn_User_Email.replace("@", "").replace(".", ""));
-
+        myRef.keepSynced(true);
+        myRef2.keepSynced(true);
         //Recycler View
         recyclerView = (RecyclerView) findViewById(R.id.show_appointment_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -147,9 +144,8 @@ public class Show_Appointments extends AppCompatActivity {
                                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            int selectedItems = position;
-                                            mFirebaseAdapter.getRef(selectedItems).removeValue();
-                                            mFirebaseAdapter.notifyItemRemoved(selectedItems);
+                                            mFirebaseAdapter.getRef(position).removeValue();
+                                            mFirebaseAdapter.notifyItemRemoved(position);
                                             recyclerView.invalidate();
                                             onStart();
                                         }
@@ -176,7 +172,7 @@ public class Show_Appointments extends AppCompatActivity {
             myRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
                 @Override
                 public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-                    Log.d("LOGGED", "I Called Yahoo ");
+                    //Log.d("LOGGED", "I Called Yahoo ");
                     if(dataSnapshot.hasChildren())
                     {
                         //Log.d("LOGGED", "Boolean value true: ");
@@ -215,7 +211,7 @@ public class Show_Appointments extends AppCompatActivity {
                 @Override
                 public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-                    Log.d("LOGGED", "onCreateViewHolder: Called ");
+                    //Log.d("LOGGED", "onCreateViewHolder: Called ");
                     return super.onCreateViewHolder(parent, viewType);
 
 
@@ -226,10 +222,6 @@ public class Show_Appointments extends AppCompatActivity {
 
                     //progressBar.setVisibility(ProgressBar.INVISIBLE);
 
-                   // viewHolder.setDoctor_URL(model.getAppointment_Doctor_Email());
-                    //viewHolder.setAppointment_Doctor_Name(model.getAppointment_Doctor_Name());
-                    //viewHolder.setAppointment_Doctor_Email(model.getAppointment_Doctor_Email());
-                    //viewHolder.setAppointment_Doctor_Phone(model.getAppointment_Doctor_phone());
                     viewHolder.setAppointment_Patient_Name(model.getPatient_Name());
                     viewHolder.setAppointment_Patient_Phone(model.getPatient_Phone());
                     viewHolder.setAppointment_Date(model.getAppointment_Date());
@@ -258,34 +250,21 @@ public class Show_Appointments extends AppCompatActivity {
                                             //intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
                                             //startActivityForResult(intent, 1);
 
-
-                                            // DatabaseReference ref = mFirebaseAdapter.getRef(position);
-                                            // ref.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
-                                            // @Override
-                                            // public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-
-
-                                            //GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {};
-                                            //Map<String, String> map = dataSnapshot.getValue(genericTypeIndicator);
-                                            //final String retrieve_Patient_Email = map.get("Patient_Email");
-
                                             myRef3 = FirebaseDatabase.getInstance().getReference().child("User_Details").child(PATIENT_EMAIL.replace("@", "").replace(".", ""));
+                                            myRef3.keepSynced(true);
                                             myRef3.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-                                                    GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {
-                                                    };
-                                                    Map<String, String> map = dataSnapshot.getValue(genericTypeIndicator);
                                                     Intent intent = new Intent(Show_Appointments.this, PatientProfile.class);
 
-                                                    String retrieve_Address = map.get("Address");
-                                                    String retrieve_name = map.get("Name");
-                                                    String retrieve_Phone = map.get("Phone");
-                                                    String retrieve_Age = map.get("Age");
-                                                    String retrieve_Height = map.get("Height");
-                                                    String retrieve_Weight = map.get("Weight");
-                                                    String retrieve_Bloodgroup = map.get("Bloodgroup");
-                                                    String retrieve_Image = map.get("Image_URL");
+                                                    String retrieve_Address = dataSnapshot.child("Address").getValue(String.class);
+                                                    String retrieve_name = dataSnapshot.child("Name").getValue(String.class);
+                                                    String retrieve_Phone = dataSnapshot.child("Phone").getValue(String.class);
+                                                    String retrieve_Age = dataSnapshot.child("Age").getValue(String.class);
+                                                    String retrieve_Height = dataSnapshot.child("Height").getValue(String.class);
+                                                    String retrieve_Weight = dataSnapshot.child("Weight").getValue(String.class);
+                                                    String retrieve_Bloodgroup = dataSnapshot.child("Bloodgroup").getValue(String.class);
+                                                    String retrieve_Image = dataSnapshot.child("Image_URL").getValue(String.class);
 
                                                     intent.putExtra("Name", retrieve_name);
                                                     intent.putExtra("Address", retrieve_Address);
@@ -317,26 +296,24 @@ public class Show_Appointments extends AppCompatActivity {
                                             //startActivityForResult(intent, 2);
                                             // myRef3 = FirebaseDatabase.getInstance().getReference().child("User_Appointment").child(PATIENT_EMAIL.replace("@","").replace(".",""));
                                             //mFirebaseAdapter.getRef(position)
-                                            Log.d("LOGGED", "Doctor Database Reference " + mFirebaseAdapter.getRef(position));
+                                            //Log.d("LOGGED", "Doctor Database Reference " + mFirebaseAdapter.getRef(position));
 
                                             myRef3 = mFirebaseAdapter.getRef(position);
-
-
                                             myRef3.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-                                                    GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {
-                                                    };
-                                                    Map<String, String> map = dataSnapshot.getValue(genericTypeIndicator);
-                                                    final String Doctors_Request_Status = map.get("Request_Status");
-                                                    final String Patient_EmailID = map.get("Patient_Email").replace("@", "").replace(".", "");
-                                                    final String Doctors_Approval_Tracking = map.get("Approval_Tracking");
+                                                    final String Doctors_Request_Status =dataSnapshot.child("Request_Status").getValue(String.class);
+                                                    final String Patient_EmailID = dataSnapshot.child("Patient_Email").getValue(String.class).replace("@", "").replace(".", "");
+                                                    final String Doctors_Approval_Tracking = dataSnapshot.child("Approval_Tracking").getValue(String.class);
+                                                    Patient_Email_ID = dataSnapshot.child("Patient_Email").getValue(String.class);
 
                                                     if(Doctors_Request_Status.equals("Pending"))
                                                     {
                                                         Toast.makeText(Show_Appointments.this, "Appointment Approved", Toast.LENGTH_SHORT).show();
                                                         myRef3.child("Request_Status").setValue("Approve");
                                                         call2nd( Patient_EmailID, Doctors_Approval_Tracking);
+
+
                                                     }
 
                                                     else {
@@ -355,6 +332,7 @@ public class Show_Appointments extends AppCompatActivity {
                                             //Intent intent = new   Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                                             //startActivityForResult(intent, 2);
                                             Toast.makeText(Show_Appointments.this, "Will Implement Later", Toast.LENGTH_SHORT).show();
+
 
                                         }
                                         else if (options[item].equals("Delete Appointment")) {
@@ -407,39 +385,57 @@ public class Show_Appointments extends AppCompatActivity {
 
 
 
-
-
-
-    public void call2nd(String Patient_EmailID, final String Doctors_Approval_Tracking)
+    public void call2nd(final String Patient_EmailID, final String Doctors_Approval_Tracking)
     {
         myRef4= root_Ref.child("User_Appointment").child(Patient_EmailID);
-
-
-//        Log.d("LOGGED", "Patient_EmailID " + Patient_EmailID);
-//        Log.d("LOGGED", "Doctors_Approval_Tracking " + Doctors_Approval_Tracking);
-//        Log.d("LOGGED", "RootRef " + myRef4);
+        myRef4.keepSynced(true);
 
         myRef4.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-                for (com.google.firebase.database.DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        //String temp = snapshot.getValue();
-                   // Log.e("Count " ,""+snapshot.getChildrenCount());
-                    //Log.e("KEY " ,""+snapshot.getKey());
-                   // Log.e("KEY " ,""+snapshot.child("Approval_Tracking").getValue());
-
+                for (final com.google.firebase.database.DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     if(snapshot.child("Approval_Tracking").getValue().equals(Doctors_Approval_Tracking))
                     {
                         final DatabaseReference snapReference = snapshot.getRef();
                         snapReference.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
                             @Override
                             public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-                                GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {
-                                };
-                                Map<String, String> map = dataSnapshot.getValue(genericTypeIndicator);
                                 //final String Approval_Tracking = map.get("Approval_Tracking");
-                                Log.e("REFERENCE " ,""+snapReference);
+                                //Log.e("REFERENCE " ,""+snapReference);
                                 snapReference.child("Request_Status").setValue("Approved");
+
+                                SimpleDateFormat current_date_format = new SimpleDateFormat( "dd/MM/yyyy" );
+                                SimpleDateFormat current_time_format = new SimpleDateFormat("h:mm a");
+
+                                String Doctor_Email = snapshot.child("Appointment_Doctor_Email").getValue().toString();
+
+                                final DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child("User_Notification").child(Patient_EmailID).push();
+                                mRootRef.child("Notification_Date").setValue(current_date_format.format( new Date()));
+                                mRootRef.child("Notification_Time").setValue(current_time_format.format( new Date()));
+                                mRootRef.child("Notification_To").setValue(Patient_Email_ID);
+                                mRootRef.child("Doctor_Email").setValue(Doctor_Email);
+
+
+                                DatabaseReference mRootRef2 = FirebaseDatabase.getInstance().getReference().child("Doctor_Detais").child(Doctor_Email.replace("@", "").replace(".", ""));
+                                mRootRef2.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        String Doctor_Image = dataSnapshot.child("Image_URL").getValue(String.class);
+                                        String Doctor_Name = dataSnapshot.child("Name").getValue(String.class);
+                                        mRootRef.child("Notification_Image").setValue(Doctor_Image);
+                                        mRootRef.child("Notification_Text").setValue("Your Appointment is Approved by " + Doctor_Name);
+                                        send_notification();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+
+
+
                             }
 
                             @Override
@@ -457,6 +453,84 @@ public class Show_Appointments extends AppCompatActivity {
         });
     }
 
+    public void send_notification()
+    {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                int SDK_INT = android.os.Build.VERSION.SDK_INT;
+                if (SDK_INT > 8) {
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                            .permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
+
+
+                    try {
+                        String jsonResponse;
+
+                        URL url = new URL("https://onesignal.com/api/v1/notifications");
+                        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                        con.setUseCaches(false);
+                        con.setDoOutput(true);
+                        con.setDoInput(true);
+
+                        con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                        con.setRequestProperty("Authorization", "Basic MmRkOGI3ODAtYzcwNi00ZmRhLWFiYjItMzZhMTdiNzY1YTBl");
+                        con.setRequestMethod("POST");
+
+                        String strJsonBody = "{"
+                                + "\"app_id\": \"d0bb9a8d-ae7a-4eef-b4f1-4b7b40992263\","
+
+                                + "\"filters\": [{\"field\": \"tag\"," +
+                                " \"key\": \"User_ID\"," +
+                                " \"relation\": \"=\", " +
+                                "\"value\": \"" + Patient_Email_ID + "\"}],"
+
+                                + "\"data\": {\"foo\": \"bar\"},"
+                                + "\"headings\": {\"en\": \"Your Appointment is Approved\"},"
+                                //+ "\"big_picture\": \"" + R.drawable.logo_pms + "\","
+                                + "\"large_icon\": \"" + R.drawable.logo_pms + "\","
+                                + "\"android_led_color\": \"#3949AB\","
+                                + "\"android_accent_color\": \"#3949AB\","
+
+                                + "\"android_background_layout\": " +
+                               // "{\"image\": \"http://3.bp.blogspot.com/-5GNtI62kFFw/U4DK7M_fNkI/AAAAAAAAADA/nvF-d_CfBsg/s1600/wp917d5eab_06.png\","
+                                 "{\"headings_color\": \"9C27B0\"," +
+                                "\"contents_color\": \"00695C\"},"
+
+                                + "\"contents\": {\"en\": \"Check your Appointment Section for Further Details.\"}"
+                                + "}";
+
+                        System.out.println("strJsonBody:\n" + strJsonBody);
+
+                        byte[] sendBytes = strJsonBody.getBytes("UTF-8");
+                        con.setFixedLengthStreamingMode(sendBytes.length);
+
+                        OutputStream outputStream = con.getOutputStream();
+                        outputStream.write(sendBytes);
+
+                        int httpResponse = con.getResponseCode();
+                        System.out.println("httpResponse: " + httpResponse);
+
+                        if (httpResponse >= HttpURLConnection.HTTP_OK
+                                && httpResponse < HttpURLConnection.HTTP_BAD_REQUEST) {
+                            Scanner scanner = new Scanner(con.getInputStream(), "UTF-8");
+                            jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                            scanner.close();
+                        } else {
+                            Scanner scanner = new Scanner(con.getErrorStream(), "UTF-8");
+                            jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                            scanner.close();
+                        }
+                        System.out.println("jsonResponse:\n" + jsonResponse);
+
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
 
 
 
@@ -501,7 +575,7 @@ public class Show_Appointments extends AppCompatActivity {
         private final TextView post_doctor_name, post_doctor_email, post_doctor_phone, post_patient_name, post_patient_phone, post_appointment_date, post_appointment_reason;
         private final ImageView post_doctor_image,post_appointment_status,post_appointment_status_doctor;
         View mView;
-        Firebase mRoofRef;
+        //Firebase mRoofRef;
         RecyclerView.ViewHolder vv;
 
         public MyViewHolder(final View itemView) {
@@ -576,18 +650,21 @@ public class Show_Appointments extends AppCompatActivity {
 
             if (url != null) {
                 String UserID = url.replace("@", "").replace(".", "");
-                mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/Doctor_Detais").child(UserID);
-                mRoofRef.addValueEventListener(new ValueEventListener() {
+                //mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/Doctor_Detais").child(UserID);
+                DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child("Doctor_Detais").child(UserID);
+                mRootRef.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Map<String, String> map = dataSnapshot.getValue(Map.class);
-                        String retrieve_url = map.get("Image_URL");
+                    public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                        //Map<String, String> map = dataSnapshot.getValue(Map.class);
+
+                        String retrieve_url = dataSnapshot.child("Image_URL").getValue(String.class);
 //                        Picasso.with(itemView.getContext())
 //                                .load(retrieve_url)
 //                                .placeholder(R.drawable.loading)
 //                                .into(post_doctor_image);
 
-                        Glide.with(itemView.getContext()).load(retrieve_url)
+                        Glide.with(itemView.getContext())
+                                .load(retrieve_url)
                                 .crossFade()
                                 .placeholder(R.drawable.loading)
                                 .thumbnail(0.1f)
@@ -596,10 +673,34 @@ public class Show_Appointments extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-                        //Nothing
+                    public void onCancelled(DatabaseError databaseError) {
+
                     }
                 });
+
+//                mRootRef.addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        Map<String, String> map = dataSnapshot.getValue(Map.class);
+//                        String retrieve_url = map.get("Image_URL");
+////                        Picasso.with(itemView.getContext())
+////                                .load(retrieve_url)
+////                                .placeholder(R.drawable.loading)
+////                                .into(post_doctor_image);
+//
+//                        Glide.with(itemView.getContext()).load(retrieve_url)
+//                                .crossFade()
+//                                .placeholder(R.drawable.loading)
+//                                .thumbnail(0.1f)
+//                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                                .into(post_doctor_image);
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(FirebaseError firebaseError) {
+//                        //Nothing
+//                    }
+//                });
             }
         }
 
@@ -609,12 +710,13 @@ public class Show_Appointments extends AppCompatActivity {
                 String UserID = url.replace("@", "").replace(".", "");
 
                 //mRoofRef = FirebaseDatabase.getInstance().getReference().child("User_Details").child(UserID);
-                mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/User_Details").child(UserID);
-                mRoofRef.addValueEventListener(new ValueEventListener() {
+                //mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/User_Details").child(UserID);
+                DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child("User_Details").child(UserID);
+                mRootRef.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Map<String, String> map = dataSnapshot.getValue(Map.class);
-                        String retrieve_url = map.get("Image_URL");
+                    public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                        //Map<String, String> map = dataSnapshot.getValue(Map.class);
+                        String retrieve_url = dataSnapshot.child("Image_URL").getValue(String.class);
 //                        Picasso.with(itemView.getContext())
 //                                .load(retrieve_url)
 //                                .placeholder(R.drawable.loading)
@@ -631,10 +733,36 @@ public class Show_Appointments extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-                        //Nothing
+                    public void onCancelled(DatabaseError databaseError) {
+
                     }
                 });
+
+//                mRoofRef.addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        Map<String, String> map = dataSnapshot.getValue(Map.class);
+//                        String retrieve_url = map.get("Image_URL");
+////                        Picasso.with(itemView.getContext())
+////                                .load(retrieve_url)
+////                                .placeholder(R.drawable.loading)
+////                                .into(post_doctor_image);
+//
+//                        Glide.with(itemView.getContext())
+//                                .load(retrieve_url)
+//                                .crossFade()
+//                                .placeholder(R.drawable.invalid_person_image)
+//                                .thumbnail(0.5f)
+//                                .bitmapTransform(new CircleTransform(itemView.getContext()))
+//                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                                .into(post_doctor_image);
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(FirebaseError firebaseError) {
+//                        //Nothing
+//                    }
+//                });
             } else {
                 //Log.d("LOGGED", "I GOT THE URL " + url);
             }

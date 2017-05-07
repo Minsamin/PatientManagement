@@ -69,6 +69,17 @@
     <string name="about_ok">OK</string>
 
     <string name="changelog_body">
+        <b><u>PM 2.6 - Changes:</u></b>\n
+
+        &#8226; Patients will get Notification if Doctor Approve his Appointment. \n
+        &#8226; Patients can see His Notification History. \n
+        &#8226; Lets Go Button working in Home Page. \n\n
+
+        <b><u>PM 2.5 - Changes:</u></b>\n
+
+        &#8226; Minor Changes in Database. \n
+        &#8226; Bug Fixes and Improvements. \n\n
+
         <b><u>PM 2.4 - Changes:</u></b>\n
 
         &#8226; Some Major UI Changes here and There. \n

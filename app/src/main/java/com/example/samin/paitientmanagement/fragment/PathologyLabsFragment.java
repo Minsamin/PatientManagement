@@ -49,6 +49,7 @@ public class PathologyLabsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         firebaseDatabase = FirebaseDatabase.getInstance();
         myRef = firebaseDatabase.getReference("Pathology_Labs");
+        myRef.keepSynced(true);
     }
 
     @Override

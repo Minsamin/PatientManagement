@@ -1,5 +1,7 @@
 package com.example.samin.paitientmanagement.activity;
 
+import android.app.DatePickerDialog;
+import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -10,8 +12,11 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,13 +25,15 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.samin.paitientmanagement.R;
-import com.firebase.client.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class PersonalInfo extends AppCompatActivity
@@ -41,7 +48,20 @@ public class PersonalInfo extends AppCompatActivity
     public String UserID;
     SimpleDateFormat current_date_format, current_time_format;
     CoordinatorLayout coordinatorLayout;
+    Calendar myCal = Calendar.getInstance();
+    DatePickerDialog.OnDateSetListener dpl = new DatePickerDialog.OnDateSetListener() {
 
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            // TODO Auto-generated method stub
+            myCal.set(Calendar.YEAR, year);
+            myCal.set(Calendar.MONTH, monthOfYear);
+            myCal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            your_appoint_date.setText("" + dayOfMonth + " / " + (monthOfYear + 1) + " / " + year );
+            your_appoint_reason.requestFocus();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +77,7 @@ public class PersonalInfo extends AppCompatActivity
         your_appoint_date = (EditText)findViewById(R.id.appoint_Visit_Date);
         your_appoint_reason = (EditText)findViewById(R.id.appoint_Visit_reason);
         your_appoint_date.setText(current_date_format.format( new Date()));
+
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout_personal_info);
 
@@ -75,6 +96,21 @@ public class PersonalInfo extends AppCompatActivity
         tx_specialization=(TextView)findViewById(R.id.d_doctor_specialization2);
         tx_timing=(TextView)findViewById(R.id.d_doctor_timing2);
         tx_fees=(TextView)findViewById(R.id.d_doctor_fees2);
+
+
+        your_appoint_date.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                //Log.d("LOGGED", "onFocusChange: ");
+                if(hasFocus) {
+                    DatePickerDialog dpd = new DatePickerDialog(PersonalInfo.this,
+                            dpl, myCal.get(Calendar.YEAR), myCal
+                            .get(Calendar.MONTH), myCal
+                            .get(Calendar.DAY_OF_MONTH));
+                    dpd.show();
+                }
+            }
+        });
 
         //tx_email.setText("Email : "+getIntent().getStringExtra("email"));
         tx_email.setText(getIntent().getStringExtra("email"));
@@ -187,41 +223,44 @@ public class PersonalInfo extends AppCompatActivity
         }
         FirebaseUser user = firebaseAuth.getCurrentUser();
         UserID=user.getEmail().replace("@","").replace(".","");
-        Firebase mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/");
-        Firebase userRef = mRoofRef.child("User_Appointment").child(UserID).push();
-        userRef.child("Patient_Name").setValue(getName);
-        userRef.child("Patient_Phone").setValue(getPhone);
-        userRef.child("Appointment_Date").setValue(getDate);
-        userRef.child("Appointment_Reason").setValue(getReason);
-        userRef.child("Appointment_Doctor_Name").setValue(intent_name.trim());
-        userRef.child("Appointment_Doctor_Email").setValue(intent_email.trim());
-        userRef.child("Appointment_Doctor_phone").setValue(intent_phone.trim());
-        userRef.child("Creation_Time").setValue(current_time_format.format( new Date()));
-        userRef.child("Creation_Date").setValue(current_date_format.format( new Date()));
-        userRef.child("Request_Status").setValue("Pending");
-        userRef.child("Patient_Email").setValue(MainActivity.LoggedIn_User_Email);
-        userRef.child("Approval_Tracking").setValue(intent_email.trim()+" + "+ current_time_format.format( new Date()) + " + " + current_date_format.format( new Date()));
+        //Firebase mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/");
+
+        DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child("User_Appointment").child(UserID).push();
+        //Firebase userRef = mRoofRef.child("User_Appointment").child(UserID).push();
+        mRootRef.child("Patient_Name").setValue(getName);
+        mRootRef.child("Patient_Phone").setValue(getPhone);
+        mRootRef.child("Appointment_Date").setValue(getDate);
+        mRootRef.child("Appointment_Reason").setValue(getReason);
+        mRootRef.child("Appointment_Doctor_Name").setValue(intent_name.trim());
+        mRootRef.child("Appointment_Doctor_Email").setValue(intent_email.trim());
+        mRootRef.child("Appointment_Doctor_phone").setValue(intent_phone.trim());
+        mRootRef.child("Creation_Time").setValue(current_time_format.format( new Date()));
+        mRootRef.child("Creation_Date").setValue(current_date_format.format( new Date()));
+        mRootRef.child("Request_Status").setValue("Pending");
+        mRootRef.child("Patient_Email").setValue(MainActivity.LoggedIn_User_Email);
+        mRootRef.child("Approval_Tracking").setValue(intent_email.trim()+" + "+ current_time_format.format( new Date()) + " + " + current_date_format.format( new Date()));
 
 
-        Firebase mRoofRef2 = new Firebase("https://patient-management-11e26.firebaseio.com/");
-        Firebase userRef2 = mRoofRef2.child("Doctor_Appointment").child(intent_email.trim().replace("@","").replace(".","")).push();
-        userRef2.child("Patient_Name").setValue(getName);
-        userRef2.child("Patient_Phone").setValue(getPhone);
-        userRef2.child("Appointment_Date").setValue(getDate);
-        userRef2.child("Appointment_Reason").setValue(getReason);
+        DatabaseReference mRootRef2 = FirebaseDatabase.getInstance().getReference().child("Doctor_Appointment").child(intent_email.trim().replace("@","").replace(".","")).push();
+        //Firebase mRoofRef2 = new Firebase("https://patient-management-11e26.firebaseio.com/");
+        //Firebase userRef2 = mRoofRef2.child("Doctor_Appointment").child(intent_email.trim().replace("@","").replace(".","")).push();
+        mRootRef2.child("Patient_Name").setValue(getName);
+        mRootRef2.child("Patient_Phone").setValue(getPhone);
+        mRootRef2.child("Appointment_Date").setValue(getDate);
+        mRootRef2.child("Appointment_Reason").setValue(getReason);
 //        userRef2.child("Appointment_Doctor_Name").setValue(intent_name.trim());
-        userRef2.child("Appointment_Doctor_Email").setValue(intent_email.trim());
+        mRootRef2.child("Appointment_Doctor_Email").setValue(intent_email.trim());
 //        userRef2.child("Appointment_Doctor_phone").setValue(intent_email.trim());
-        userRef2.child("Creation_Time").setValue(current_time_format.format( new Date()));
-        userRef2.child("Creation_Date").setValue(current_date_format.format( new Date()));
-        userRef2.child("Request_Status").setValue("Pending");
-        userRef2.child("Patient_Email").setValue(MainActivity.LoggedIn_User_Email);
-        userRef2.child("Approval_Tracking").setValue(intent_email.trim()+" + "+ current_time_format.format( new Date()) + " + " + current_date_format.format( new Date()));
+        mRootRef2.child("Creation_Time").setValue(current_time_format.format( new Date()));
+        mRootRef2.child("Creation_Date").setValue(current_date_format.format( new Date()));
+        mRootRef2.child("Request_Status").setValue("Pending");
+        mRootRef2.child("Patient_Email").setValue(MainActivity.LoggedIn_User_Email);
+        mRootRef2.child("Approval_Tracking").setValue(intent_email.trim()+" + "+ current_time_format.format( new Date()) + " + " + current_date_format.format( new Date()));
 
 
 
         Toast.makeText(this, "Appointment Registered", Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "Email was: " + MainActivity.LoggedIn_User_Email, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Email was: " + MainActivity.LoggedIn_User_Email, Toast.LENGTH_SHORT).show();
 
         your_name.setText("");
         your_phone.setText("");

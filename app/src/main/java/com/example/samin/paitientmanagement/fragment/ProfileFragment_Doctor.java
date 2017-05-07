@@ -23,25 +23,20 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.samin.paitientmanagement.R;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
-import java.util.Map;
+
 
 import static android.app.Activity.RESULT_OK;
 
@@ -51,17 +46,19 @@ public class ProfileFragment_Doctor extends Fragment {
     private EditText doctor_name, doctor_phone, doctor_chamber, doctor_Specialization,doctor_Experience,doctor_Fees,doctor_timing;
     private Button doctor_save_button;
     private ImageView doctor_image, change_image;
-    private Firebase mRoofRef,mRoofRef_doctor;
+    //private Firebase mRoofRef,mRoofRef_doctor;
     private FirebaseAuth firebaseAuth;
     private Uri mImageUri = null;
-    private DatabaseReference mdatabaseRef;
+    //private DatabaseReference mdatabaseRef;
     private StorageReference mStorage;
+    private DatabaseReference mRootRef;
+    private DatabaseReference mRoofRef_doctor;
     private static final int GALLERY_INTENT = 2;
     private ProgressDialog mProgressDialog;
     public String UserID;
-    EditText sun_am, sun_pm, mon_am, mon_pm, tues_am, tues_pm, wed_am, wed_pm, thu_am, thu_pm, fri_am, fri_pm, sat_am, sat_pm;
-    CheckBox sun, mon, tues, wed, thu, fri, sat;
-    Context context;
+    private EditText sun_am, sun_pm, mon_am, mon_pm, tues_am, tues_pm, wed_am, wed_pm, thu_am, thu_pm, fri_am, fri_pm, sat_am, sat_pm;
+    private CheckBox sun, mon, tues, wed, thu, fri, sat;
+    private Context context;
 
     public static final int READ_EXTERNAL_STORAGE = 0;
     //final ArrayList seletedItems=new ArrayList();
@@ -75,7 +72,7 @@ public class ProfileFragment_Doctor extends Fragment {
         super.onCreate(savedInstanceState);
         firebaseAuth = FirebaseAuth.getInstance();
         context = getActivity();
-        Log.d("LOGGED", "onCreate: context " + context);
+        //Log.d("LOGGED", "onCreate: context " + context);
 
     }
 
@@ -415,7 +412,7 @@ public class ProfileFragment_Doctor extends Fragment {
                             // String times = String.valueOf(seletedItems).replace("[","").replace("]","");
 
                             //doctor_timing.setText(times);
-                            // seletedItems.clear();
+                            // selectedItems.clear();
 
 
                             if(sun.isChecked()) {
@@ -562,103 +559,194 @@ public class ProfileFragment_Doctor extends Fragment {
             });
 
             doctor_save_button = (Button) v.findViewById(R.id.profile_save_button);
-            mdatabaseRef = FirebaseDatabase.getInstance().getReference();
+           // mdatabaseRef = FirebaseDatabase.getInstance().getReference();
 
             FirebaseUser user = firebaseAuth.getCurrentUser();
             UserID = user.getEmail().replace("@", "").replace(".", "");
-            mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("Doctor_Detais").child(UserID);
+
+         mRootRef = FirebaseDatabase.getInstance().getReference().child("Doctor_Detais").child(UserID);
+        mRootRef.keepSynced(true);
+            //mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("Doctor_Detais").child(UserID);
 
             //For Update UserDetails Database Table for Doctors.
-            mRoofRef_doctor = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
+         mRoofRef_doctor = FirebaseDatabase.getInstance().getReference().child("User_Details").child(UserID);
+        mRoofRef_doctor.keepSynced(true);
+            //mRoofRef_doctor = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
 
-            mStorage = FirebaseStorage.getInstance().getReferenceFromUrl("gs://patient-management-11e26.appspot.com/");
+            //mStorage = FirebaseStorage.getInstance().getReferenceFromUrl("gs://patient-management-11e26.appspot.com/");
 
-            mRoofRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    Map<String, String> map = dataSnapshot.getValue(Map.class);
-
-                    String retrieve_name = map.get("Name");
-                    String retrieve_phone = map.get("Phone");
-                    String retrieve_chamber = map.get("Chamber");
-                    String retrieve_Specialization = map.get("Specialization");
-                    String retrieve_Experience = map.get("Experience");
-                    String retrieve_Fees = map.get("Fees");
-                    String retrieve_timing = map.get("Timing");
-                    String retrieve_url = map.get("Image_URL");
-
-                    Log.d("LOGGED", "onDataChange: v.context " + v.getContext());
-
-                    if (retrieve_name.matches("Null"))
-                        doctor_name.setText("");
-                    else
-                        doctor_name.setText(retrieve_name);
+        mRootRef.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+               // Map<String, String> map = dataSnapshot.getValue(Map.class);
 
 
-                    if (retrieve_phone.matches("Null"))
-                        doctor_phone.setText("");
-                    else
-                        doctor_phone.setText(retrieve_phone);
+                String retrieve_name = dataSnapshot.child("Name").getValue(String.class);
+                String retrieve_phone = dataSnapshot.child("Phone").getValue(String.class);
+                String retrieve_chamber = dataSnapshot.child("Chamber").getValue(String.class);
+                String retrieve_Specialization = dataSnapshot.child("Specialization").getValue(String.class);
+                String retrieve_Experience = dataSnapshot.child("Experience").getValue(String.class);
+                String retrieve_Fees = dataSnapshot.child("Fees").getValue(String.class);
+                String retrieve_timing = dataSnapshot.child("Timing").getValue(String.class);
+                String retrieve_url = dataSnapshot.child("Image_URL").getValue(String.class);
+
+                //Log.d("LOGGED", "onDataChange: v.context " + v.getContext());
+
+                if (retrieve_name.matches("Null"))
+                    doctor_name.setText("");
+                else
+                    doctor_name.setText(retrieve_name);
 
 
-                    if (retrieve_chamber.matches("Null"))
-                        doctor_chamber.setText("");
-                    else
-                        doctor_chamber.setText(retrieve_chamber);
+                if (retrieve_phone.matches("Null"))
+                    doctor_phone.setText("");
+                else
+                    doctor_phone.setText(retrieve_phone);
 
 
-                    if (retrieve_Specialization.matches("Null"))
-                        doctor_Specialization.setText("");
-                    else
-                        doctor_Specialization.setText(retrieve_Specialization);
+                if (retrieve_chamber.matches("Null"))
+                    doctor_chamber.setText("");
+                else
+                    doctor_chamber.setText(retrieve_chamber);
 
 
-                    if (retrieve_Experience.matches("Null"))
-                        doctor_Experience.setText("");
-                    else
-                        doctor_Experience.setText(retrieve_Experience);
+                if (retrieve_Specialization.matches("Null"))
+                    doctor_Specialization.setText("");
+                else
+                    doctor_Specialization.setText(retrieve_Specialization);
 
 
-                    if (retrieve_Fees.matches("Null"))
-                        doctor_Fees.setText("");
-                    else
-                        doctor_Fees.setText(retrieve_Fees);
+                if (retrieve_Experience.matches("Null"))
+                    doctor_Experience.setText("");
+                else
+                    doctor_Experience.setText(retrieve_Experience);
 
 
-                    if (retrieve_timing.matches("Null"))
-                        doctor_timing.setText("");
-                    else
-                        doctor_timing.setText(retrieve_timing);
+                if (retrieve_Fees.matches("Null"))
+                    doctor_Fees.setText("");
+                else
+                    doctor_Fees.setText(retrieve_Fees);
 
 
-                    if (retrieve_url.matches("Null"))
-                        Picasso.with(context).load(R.drawable.invalid_person_image).into(doctor_image);
+                if (retrieve_timing.matches("Null"))
+                    doctor_timing.setText("");
+                else
+                    doctor_timing.setText(retrieve_timing);
 
-                        //Glide Gives Context Errors :(
+
+                if (retrieve_url.matches("Null"))
+                    Picasso.with(context).load(R.drawable.invalid_person_image).into(doctor_image);
+
+                    //Glide Gives Context Errors :(
 //                        Glide.with(context)
 //                                .load(R.drawable.invalid_person_image)
 //                                .crossFade()
 //                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
 //                                .into(user_image);
-                    else
-                        Picasso.with(getContext()).load(retrieve_url).into(doctor_image);
+                else
+                    Picasso.with(getContext()).load(retrieve_url).into(doctor_image);
 
-                    //Glide Gives Context Errors :(
+                //Glide Gives Context Errors :(
 //                        Glide.with(v.getContext())
 //                                .load(retrieve_url)
 //                                .crossFade()
 //                                .placeholder(R.drawable.loading)
 //                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
 //                                .into(user_image);
+            }
 
-                }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                @Override
-                public void onCancelled(FirebaseError firebaseError) {
+            }
+        });
 
-                }
-            });
+//            mRoofRef.addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                    Map<String, String> map = dataSnapshot.getValue(Map.class);
+//
+//                    String retrieve_name = map.get("Name");
+//                    String retrieve_phone = map.get("Phone");
+//                    String retrieve_chamber = map.get("Chamber");
+//                    String retrieve_Specialization = map.get("Specialization");
+//                    String retrieve_Experience = map.get("Experience");
+//                    String retrieve_Fees = map.get("Fees");
+//                    String retrieve_timing = map.get("Timing");
+//                    String retrieve_url = map.get("Image_URL");
+//
+//                    Log.d("LOGGED", "onDataChange: v.context " + v.getContext());
+//
+//                    if (retrieve_name.matches("Null"))
+//                        doctor_name.setText("");
+//                    else
+//                        doctor_name.setText(retrieve_name);
+//
+//
+//                    if (retrieve_phone.matches("Null"))
+//                        doctor_phone.setText("");
+//                    else
+//                        doctor_phone.setText(retrieve_phone);
+//
+//
+//                    if (retrieve_chamber.matches("Null"))
+//                        doctor_chamber.setText("");
+//                    else
+//                        doctor_chamber.setText(retrieve_chamber);
+//
+//
+//                    if (retrieve_Specialization.matches("Null"))
+//                        doctor_Specialization.setText("");
+//                    else
+//                        doctor_Specialization.setText(retrieve_Specialization);
+//
+//
+//                    if (retrieve_Experience.matches("Null"))
+//                        doctor_Experience.setText("");
+//                    else
+//                        doctor_Experience.setText(retrieve_Experience);
+//
+//
+//                    if (retrieve_Fees.matches("Null"))
+//                        doctor_Fees.setText("");
+//                    else
+//                        doctor_Fees.setText(retrieve_Fees);
+//
+//
+//                    if (retrieve_timing.matches("Null"))
+//                        doctor_timing.setText("");
+//                    else
+//                        doctor_timing.setText(retrieve_timing);
+//
+//
+//                    if (retrieve_url.matches("Null"))
+//                        Picasso.with(context).load(R.drawable.invalid_person_image).into(doctor_image);
+//
+//                        //Glide Gives Context Errors :(
+////                        Glide.with(context)
+////                                .load(R.drawable.invalid_person_image)
+////                                .crossFade()
+////                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+////                                .into(user_image);
+//                    else
+//                        Picasso.with(getContext()).load(retrieve_url).into(doctor_image);
+//
+//                    //Glide Gives Context Errors :(
+////                        Glide.with(v.getContext())
+////                                .load(retrieve_url)
+////                                .crossFade()
+////                                .placeholder(R.drawable.loading)
+////                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+////                                .into(user_image);
+//
+//                }
+//
+//                @Override
+//                public void onCancelled(FirebaseError firebaseError) {
+//
+//                }
+//            });
 
             doctor_save_button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -676,21 +764,21 @@ public class ProfileFragment_Doctor extends Fragment {
                         return;
                     }
 
-                    mRoofRef.child("Name").setValue(mName);
+                    mRootRef.child("Name").setValue(mName);
 
-                    mRoofRef.child("Phone").setValue(mPhone);
+                    mRootRef.child("Phone").setValue(mPhone);
 
-                    mRoofRef.child("Chamber").setValue(mChamber);
+                    mRootRef.child("Chamber").setValue(mChamber);
 
-                    mRoofRef.child("Specialization").setValue(mSpecialization);
+                    mRootRef.child("Specialization").setValue(mSpecialization);
 
-                    mRoofRef.child("Experience").setValue(mExperience);
+                    mRootRef.child("Experience").setValue(mExperience);
 
-                    mRoofRef.child("Fees").setValue(mFees);
+                    mRootRef.child("Fees").setValue(mFees);
 
 
 
-                    mRoofRef.child("Timing").setValue(mTiming);
+                    mRootRef.child("Timing").setValue(mTiming);
 
                     Toast.makeText(getActivity(), "Information Updated ", Toast.LENGTH_SHORT).show();
 
@@ -715,8 +803,9 @@ public class ProfileFragment_Doctor extends Fragment {
 
             mImageUri = data.getData();
             doctor_image.setImageURI(mImageUri);
-            StorageReference filePath = mStorage.child("Doctor_Images").child(mImageUri.getLastPathSegment());
-
+            //StorageReference filePath = mStorage.child("Doctor_Images").child(mImageUri.getLastPathSegment());
+            StorageReference filePath = FirebaseStorage.getInstance().getReference().child("Doctor_Images").child(mImageUri.getLastPathSegment());
+            Log.d("LOGGED", "ImageURI : " +mImageUri);
             //the Progress bar Should be Here
             mProgressDialog.setMessage("Uploading Image....");
             mProgressDialog.show();
@@ -724,8 +813,8 @@ public class ProfileFragment_Doctor extends Fragment {
             filePath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                     Uri downloadUri = taskSnapshot.getDownloadUrl();
-                    mRoofRef.child("Image_URL").setValue(downloadUri.toString());
+                    @SuppressWarnings("VisibleForTests") Uri downloadUri = taskSnapshot.getDownloadUrl();
+                    mRootRef.child("Image_URL").setValue(downloadUri.toString());
 
 
                     //mRoofRef_doctor = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);

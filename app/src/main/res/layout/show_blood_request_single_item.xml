@@ -39,10 +39,11 @@
                     android:layout_margin="5dp"
                     android:text="@string/demo"
                     android:textAlignment="center"
-                    android:textColor="@color/Black"
+                    android:textColor="@color/white"
                     android:textSize="20sp"
                     android:textStyle="bold|italic" />
             </LinearLayout>
+
             <View
                 android:id="@+id/show_blood_request_view2"
                 android:layout_width="match_parent"

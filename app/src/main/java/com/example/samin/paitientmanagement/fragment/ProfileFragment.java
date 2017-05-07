@@ -24,13 +24,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.samin.paitientmanagement.R;
 import com.example.samin.paitientmanagement.activity.MainActivity;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -47,11 +44,12 @@ public class ProfileFragment extends Fragment {
     private EditText user_name, user_phone, user_address, user_age, user_height, user_weight, user_bloodgroup;
     private Button user_save_button;
     private ImageView user_image, change_image;
-    private Firebase mRoofRef;
+    //private Firebase mRoofRef;
     private FirebaseAuth firebaseAuth;
     private Uri mImageUri = null;
-    private DatabaseReference mdatabaseRef;
-    private StorageReference mStorage;
+    //private DatabaseReference mdatabaseRef;
+   private DatabaseReference mRootRef;
+   // private StorageReference mStorage;
     private static final int GALLERY_INTENT = 2;
     private ProgressDialog mProgressDialog;
     public String UserID;
@@ -69,7 +67,7 @@ public class ProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
         firebaseAuth = FirebaseAuth.getInstance();
         context = getActivity();
-        Log.d("LOGGED", "onCreate: context " + context);
+       // Log.d("LOGGED", "onCreate: context " + context);
 
     }
 
@@ -124,99 +122,93 @@ public class ProfileFragment extends Fragment {
             });
 
             user_save_button = (Button) v.findViewById(R.id.profile_save_button);
-            mdatabaseRef = FirebaseDatabase.getInstance().getReference();
+            //mdatabaseRef = FirebaseDatabase.getInstance().getReference();
 
             FirebaseUser user = firebaseAuth.getCurrentUser();
             UserID = user.getEmail().replace("@", "").replace(".", "");
-            mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
-            mStorage = FirebaseStorage.getInstance().getReferenceFromUrl("gs://patient-management-11e26.appspot.com/");
+            //mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/").child("User_Details").child(UserID);
+            mRootRef = FirebaseDatabase.getInstance().getReference().child("User_Details").child(UserID);
+            mRootRef.keepSynced(true);
+            //mStorage = FirebaseStorage.getInstance().getReferenceFromUrl("gs://patient-management-11e26.appspot.com/");
 
-            mRoofRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    Map<String, String> map = dataSnapshot.getValue(Map.class);
-
-                    String retrieve_name = map.get("Name");
-                    String retrieve_phone = map.get("Phone");
-                    String retrieve_address = map.get("Address");
-                    String retrieve_age = map.get("Age");
-                    String retrieve_height = map.get("Height");
-                    String retrieve_weight = map.get("Weight");
-                    String retrieve_bloodgroup = map.get("Bloodgroup");
-                    String retrieve_url = map.get("Image_URL");
-
-                    Log.d("LOGGED", "onDataChange: v.context " + v.getContext());
-
-                    if (retrieve_name.matches("Null"))
-                        user_name.setText("");
-                    else
-                        user_name.setText(retrieve_name);
+            mRootRef.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+               // Map<String, String> map = dataSnapshot.getValue(Map.class);
 
 
-                    if (retrieve_phone.matches("Null"))
-                        user_phone.setText("");
-                    else
-                        user_phone.setText(retrieve_phone);
+                String retrieve_name = dataSnapshot.child("Name").getValue(String.class);
+                String retrieve_phone = dataSnapshot.child("Phone").getValue(String.class);
+                String retrieve_address = dataSnapshot.child("Address").getValue(String.class);
+                String retrieve_age = dataSnapshot.child("Age").getValue(String.class);
+                String retrieve_height = dataSnapshot.child("Height").getValue(String.class);
+                String retrieve_weight = dataSnapshot.child("Weight").getValue(String.class);
+                String retrieve_bloodgroup = dataSnapshot.child("Bloodgroup").getValue(String.class);
+                String retrieve_url = dataSnapshot.child("Image_URL").getValue(String.class);
+
+                Log.d("LOGGED", "onDataChange: v.context " + v.getContext());
+
+                if (retrieve_name.matches("Null"))
+                    user_name.setText("");
+                else
+                    user_name.setText(retrieve_name);
 
 
-                    if (retrieve_address.matches("Null"))
-                        user_address.setText("");
-                    else
-                        user_address.setText(retrieve_address);
+                if (retrieve_phone.matches("Null"))
+                    user_phone.setText("");
+                else
+                    user_phone.setText(retrieve_phone);
 
 
-                    if (retrieve_age.matches("Null"))
-                        user_age.setText("");
-                    else
-                        user_age.setText(retrieve_age);
+                if (retrieve_address.matches("Null"))
+                    user_address.setText("");
+                else
+                    user_address.setText(retrieve_address);
 
 
-                    if (retrieve_height.matches("Null"))
-                        user_height.setText("");
-                    else
-                        user_height.setText(retrieve_height);
+                if (retrieve_age.matches("Null"))
+                    user_age.setText("");
+                else
+                    user_age.setText(retrieve_age);
 
 
-                    if (retrieve_weight.matches("Null"))
-                        user_weight.setText("");
-                    else
-                        user_weight.setText(retrieve_weight);
+                if (retrieve_height.matches("Null"))
+                    user_height.setText("");
+                else
+                    user_height.setText(retrieve_height);
 
 
-                    if (retrieve_bloodgroup.matches("Null"))
-                        user_bloodgroup.setText("");
-                    else
-                        user_bloodgroup.setText(retrieve_bloodgroup);
+                if (retrieve_weight.matches("Null"))
+                    user_weight.setText("");
+                else
+                    user_weight.setText(retrieve_weight);
 
 
-                    if (retrieve_url.matches("Null"))
-                        Picasso.with(context).load(R.drawable.invalid_person_image).into(user_image);
+                if (retrieve_bloodgroup.matches("Null"))
+                    user_bloodgroup.setText("");
+                else
+                    user_bloodgroup.setText(retrieve_bloodgroup);
 
-                        //Glide Gives Context Errors :(
+
+                if (retrieve_url.matches("Null"))
+                    Picasso.with(context).load(R.drawable.invalid_person_image).into(user_image);
+
+                    //Glide Gives Context Errors :(
 //                        Glide.with(context)
 //                                .load(R.drawable.invalid_person_image)
 //                                .crossFade()
 //                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
 //                                .into(user_image);
-                    else
-                        Picasso.with(getContext()).load(retrieve_url).into(user_image);
+                else
+                    Picasso.with(getContext()).load(retrieve_url).into(user_image);
 
-                    //Glide Gives Context Errors :(
-//                        Glide.with(v.getContext())
-//                                .load(retrieve_url)
-//                                .crossFade()
-//                                .placeholder(R.drawable.loading)
-//                                .diskCacheStrategy(DiskCacheStrategy.RESULT)
-//                                .into(user_image);
+            }
 
-                }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                @Override
-                public void onCancelled(FirebaseError firebaseError) {
-
-                }
-            });
+            }
+        });
 
             user_save_button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -233,26 +225,20 @@ public class ProfileFragment extends Fragment {
                         Toast.makeText(getContext(), "Fill all Field", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    Firebase childRef_name = mRoofRef.child("Name");
-                    childRef_name.setValue(mName);
+                    mRootRef.child("Name").setValue(mName);
 
-                    Firebase childRef_phone = mRoofRef.child("Phone");
-                    childRef_phone.setValue(mPhone);
+                    mRootRef.child("Phone").setValue(mPhone);
 
-                    Firebase childRef_address = mRoofRef.child("Address");
-                    childRef_address.setValue(mAddress);
+                    mRootRef.child("Address").setValue(mAddress);
 
-                    Firebase childRef_age = mRoofRef.child("Age");
-                    childRef_age.setValue(mAge);
+                     mRootRef.child("Age").setValue(mAge);
 
-                    Firebase childRef_height = mRoofRef.child("Height");
-                    childRef_height.setValue(mHeight);
+                    mRootRef.child("Height").setValue(mHeight);
 
-                    Firebase childRef_weight = mRoofRef.child("Weight");
-                    childRef_weight.setValue(mWeight);
+                    mRootRef.child("Weight").setValue(mWeight);
 
-                    Firebase childRef_bloodgroup = mRoofRef.child("Bloodgroup");
-                    childRef_bloodgroup.setValue(mBloodgroup);
+                    mRootRef.child("Bloodgroup").setValue(mBloodgroup);
+
                     Toast.makeText(getActivity(), "Updated Info", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -271,8 +257,9 @@ public class ProfileFragment extends Fragment {
 
             mImageUri = data.getData();
             user_image.setImageURI(mImageUri);
-            StorageReference filePath = mStorage.child("User_Images").child(mImageUri.getLastPathSegment());
-
+            //StorageReference filePath = mStorage.child("User_Images").child(mImageUri.getLastPathSegment());
+            StorageReference filePath = FirebaseStorage.getInstance().getReference().child("User_Images").child(mImageUri.getLastPathSegment());
+            //Log.d("LOGGED", "ImageURI : " +mImageUri);
             //the Progress bar Should be Here
             mProgressDialog.setMessage("Uploading Image....");
             mProgressDialog.show();
@@ -280,8 +267,8 @@ public class ProfileFragment extends Fragment {
             filePath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                     Uri downloadUri = taskSnapshot.getDownloadUrl();
-                    mRoofRef.child("Image_URL").setValue(downloadUri.toString());
+                    @SuppressWarnings("VisibleForTests") Uri downloadUri = taskSnapshot.getDownloadUrl();
+                    mRootRef.child("Image_URL").setValue(downloadUri.toString());
 
                     Glide.with(getContext())
                                 .load(downloadUri)

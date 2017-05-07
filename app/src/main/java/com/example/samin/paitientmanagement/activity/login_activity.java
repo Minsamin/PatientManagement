@@ -2,6 +2,7 @@ package com.example.samin.paitientmanagement.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -35,10 +36,11 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
     private ProgressDialog PGD;
     private FirebaseAuth firebaseAuth;
     private TextView forget_pass,new_user;
-    TextInputLayout password_Field;
+    private TextInputLayout password_Field;
     private Boolean flag=false;
     private String email,pass;
     public static Activity login_Activity;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState ) {
@@ -54,7 +56,7 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
         if(firebaseAuth.getCurrentUser() != null)
         {
             //User Already logged In
-            finish();
+            this.finish();
             startActivity(new Intent(getApplicationContext(),MainActivity.class));
         }
 
@@ -114,7 +116,6 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
                     email = et_email.getText().toString().trim();
                     if (TextUtils.isEmpty(email)) {
                         Toast.makeText(getApplication(), "Enter your registered Email Id", Toast.LENGTH_SHORT).show();
-                        return;
                     }
                     else
                     {

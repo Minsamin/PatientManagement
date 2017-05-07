@@ -2,12 +2,14 @@ package com.example.samin.paitientmanagement.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,7 +17,6 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.example.samin.paitientmanagement.R;
-import com.firebase.client.Firebase;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -23,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.ProviderQueryResult;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 
@@ -36,10 +38,10 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
     private ProgressDialog PGD;
     private FirebaseAuth firebaseAuth;
     FirebaseUser user;
-    public String UserID,email,pass,Designation;
-    private Firebase mRoofRef,userRef;
+    public String UserID,email,pass;
+    //private Firebase mRoofRef,userRef;
     RadioButton RB_doctor,RB_patient;
-    public static Activity create_Activity;
+    //public static Activity create_Activity;
 
 
     @Override
@@ -48,7 +50,7 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.account_signup);
         firebaseAuth = FirebaseAuth.getInstance();
         PGD = new ProgressDialog(this);
-        create_Activity = this;
+        //create_Activity = this;
 
 
         //FireBase Details
@@ -165,74 +167,69 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
 
                             UserID=user.getEmail().replace("@","").replace(".","");
                             //mRoofRef= new Firebase("https://patient-management-11e26.firebaseio.com/"+"User_Details/"+UserID);
-                            mRoofRef= new Firebase("https://patient-management-11e26.firebaseio.com/");
-
+                           // mRoofRef= new Firebase("https://patient-management-11e26.firebaseio.com/");
+                            DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
                             if(RB_patient.isChecked())
                             {
-                                userRef = mRoofRef.child("User_Details").child(UserID);
+                                DatabaseReference ref1= mRootRef.child("User_Details").child(UserID);
 
-                                userRef.child("Name").setValue("Null");
+                                ref1.child("Name").setValue("Null");
 
-                                userRef.child("Phone").setValue("Null");
+                                ref1.child("Phone").setValue("Null");
 
-                                userRef.child("Address").setValue("Null");
+                                ref1.child("Address").setValue("Null");
 
-                                userRef.child("Age").setValue("Null");
+                                ref1.child("Age").setValue("Null");
 
-                                userRef.child("Height").setValue("Null");
+                                ref1.child("Height").setValue("Null");
 
-                                userRef.child("Weight").setValue("Null");
+                                ref1.child("Weight").setValue("Null");
 
-                                userRef.child("Bloodgroup").setValue("Null");
+                                ref1.child("Bloodgroup").setValue("Null");
 
-                                userRef.child("Image_URL").setValue("Null");
+                                ref1.child("Image_URL").setValue("Null");
 
-                                userRef.child("User_Type").setValue("Patient");
+                                ref1.child("User_Type").setValue("Patient");
 
                                 //Designation = "Patient";
                             }
 
 
-
-
-
-
-
                             if(RB_doctor.isChecked())
                             {
-                                userRef = mRoofRef.child("Doctor_Detais").child(UserID);
+                                DatabaseReference ref3= mRootRef.child("User_Details").child(UserID);
+                                // userRef = mRoofRef.child("User_Details").child(UserID);
 
-                                userRef.child("Name").setValue("Null");
+                                ref3.child("Name").setValue("Null");
+                                ref3.child("Image_URL").setValue("Null");
+                                ref3.child("User_Type").setValue("Doctor");
+                                Log.d("LOGGED", "User_Type Checked " );
 
-                                userRef.child("Phone").setValue("Null");
 
-                                userRef.child("Chamber").setValue("Null");
+                                DatabaseReference ref1= mRootRef.child("Doctor_Detais").child(UserID);
+                               // userRef = mRoofRef.child("Doctor_Detais").child(UserID);
 
-                                userRef.child("Specialization").setValue("Null");
+                                ref1.child("Name").setValue("Null");
 
-                                userRef.child("Experience").setValue("Null");
+                                ref1.child("Phone").setValue("Null");
 
-                                userRef.child("Fees").setValue("Null");
+                                ref1.child("Chamber").setValue("Null");
 
-                                userRef.child("Timing").setValue("Null");
+                                ref1.child("Specialization").setValue("Null");
 
-                                userRef.child("User_Type").setValue("Doctor");
+                                ref1.child("Experience").setValue("Null");
 
-                                userRef.child("Image_URL").setValue("Null");
+                                ref1.child("Fees").setValue("Null");
 
-                                userRef.child("Email").setValue(user.getEmail());
+                                ref1.child("Timing").setValue("Null");
+
+                                ref1.child("User_Type").setValue("Doctor");
+
+                                ref1.child("Image_URL").setValue("Null");
+
+                                ref1.child("Email").setValue(user.getEmail());
 
                                // Designation = "Doctor";
-
-
-
-                                userRef = mRoofRef.child("User_Details").child(UserID);
-
-                                userRef.child("Name").setValue("Null");
-                                userRef.child("Image_URL").setValue("Null");
-
-                                userRef.child("User_Type").setValue("Doctor");
-
                             }
 
 
@@ -269,5 +266,4 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
         startActivity(i);
 
     }
-
 }

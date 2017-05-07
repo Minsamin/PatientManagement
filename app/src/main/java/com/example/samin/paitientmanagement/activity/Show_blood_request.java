@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,10 +21,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.samin.paitientmanagement.R;
 import com.example.samin.paitientmanagement.other.Show_appointment_data_item;
 import com.example.samin.paitientmanagement.other.Show_blood_request_data_item;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -55,7 +52,7 @@ public class Show_blood_request extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("Requests");
+            actionBar.setTitle(Html.fromHtml("<font color=#FFFFFF>" + "Requests" + "</font>"));
         }
        // Log.d("LOGGED", "----------------------- START NEW --------------------------");
 
@@ -65,6 +62,7 @@ public class Show_blood_request extends AppCompatActivity {
         //Log.d("LOGGED ", " USER " + user.toString());
         UserID = user.getEmail().replace("@", "").replace(".", "");
         myRef = FirebaseDatabase.getInstance().getReference("Blood_Request");
+        myRef.keepSynced(true);
 
         //Recycler View
         recyclerView = (RecyclerView) findViewById(R.id.show_blood_request_recycler_view);
