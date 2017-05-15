@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '25.0.3'
 
     //The aapt tool may inflate PNG files that have already been compressed.
     //It means Android studio DO NOT check PNG strictly.
@@ -55,26 +55,22 @@ dependencies {
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.google.firebase:firebase-auth:10.2.1'
-    compile 'com.google.firebase:firebase-database:10.2.1'
-
-    compile 'com.google.firebase:firebase-storage:10.2.1'
+    compile 'com.google.firebase:firebase-auth:10.2.4'
+    compile 'com.google.firebase:firebase-database:10.2.4'
+    compile 'com.google.firebase:firebase-storage:10.2.4'
     // FirebaseUI Database only
     compile 'com.firebaseui:firebase-ui-database:1.2.0'
     // FirebaseUI Storage only
     //compile 'com.firebaseui:firebase-ui-storage:1.2.0'
-
-
     //compile 'com.google.firebase:firebase-core:10.2.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
-
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.onesignal:OneSignal:3.4.4@aar'
     // Required for OneSignal, even if you have added FCM.
-    compile 'com.google.android.gms:play-services-gcm:10.2.1'
+    compile 'com.google.android.gms:play-services-gcm:10.2.4'
     // Required for geotagging
-    compile 'com.google.android.gms:play-services-location:10.2.1'
+    compile 'com.google.android.gms:play-services-location:10.2.4'
     // play-services-analytics is only needed when using 8.1.0 or older.
     // compile 'com.google.android.gms:play-services-analytics:+'
     compile 'com.github.vipulasri:timelineview:1.0.5'

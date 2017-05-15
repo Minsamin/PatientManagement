@@ -191,6 +191,10 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
 
                                 ref1.child("User_Type").setValue("Patient");
 
+                                ref1.child("Email").setValue(user.getEmail());
+
+                                ref1.child("Name_Present").setValue("NO");
+
                                 //Designation = "Patient";
                             }
 

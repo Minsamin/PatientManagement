@@ -1,22 +1,19 @@
 package com.example.samin.paitientmanagement.fragment;
 
-import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.StrictMode;
+
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
+
+import android.support.v4.util.ArrayMap;
 import android.support.v4.widget.DrawerLayout;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+
 import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
+
 import android.widget.Toast;
 
 import com.daimajia.slider.library.Animations.DescriptionAnimation;
@@ -26,26 +23,25 @@ import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.example.samin.paitientmanagement.R;
 import com.example.samin.paitientmanagement.activity.MainActivity;
-//import com.example.samin.paitientmanagement.other.TransformerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.TimerTask;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class HomeFragment extends Fragment implements BaseSliderView.OnSliderClickListener, ViewPagerEx.OnPageChangeListener{
-    Button notification;
+    //Button notification;
     //private Handler mHandler;
-    private DrawerLayout drawer;
+    //private DrawerLayout drawer;
 
-    TextView heading1,heading2,tv_1,tv_2,tv_3,tv_4,tv_5,tv_6;
-    private SliderLayout mDemoSlider;
     public Button get_started_button;
+    public String User_Email;
     //private DrawerLayout drawer;
     public HomeFragment() {
         // Required empty public constructor
@@ -66,8 +62,8 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
          v = inflater.inflate(R.layout.fragment_home, container, false);
 
 
-        mDemoSlider = (SliderLayout)v.findViewById(R.id.slider);
-        drawer = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+        SliderLayout mDemoSlider = (SliderLayout) v.findViewById(R.id.slider);
+        //drawer = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
         // getActivity().findViewById(R.id.drawer_layout);
 
 //        HashMap<String,String> url_maps = new HashMap<String, String>();
@@ -77,15 +73,18 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
 //        url_maps.put("Game of Thrones", "http://images.boomsbeat.com/data/images/full/19640/game-of-thrones-season-4-jpg.jpg");
 
 
-        HashMap<String,Integer> file_maps = new HashMap<String, Integer>();
+        ArrayMap<String,Integer> file_maps = new ArrayMap<>();
         file_maps.put("Online Medical",R.drawable.banner_1);
         file_maps.put("Doctors",R.drawable.banner_2);
         file_maps.put("Blood Donation",R.drawable.banner_3);
         //file_maps.put("Game of Thrones", R.drawable.invalid_person_image);
 
+        //Log.d("LOGGED", "MAP SIZE: " + file_maps.size());
+
         for(String name : file_maps.keySet()){
             TextSliderView textSliderView = new TextSliderView(getContext());
             // initialize a SliderLayout
+            Log.d("LOGGED", "For Loop Executed with Name : " + name);
             textSliderView
                     .description(name)
                     .image(file_maps.get(name))
@@ -93,9 +92,8 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
                     .setOnSliderClickListener(this);
 
             //add your extra information
-            textSliderView.bundle(new Bundle());
-            textSliderView.getBundle()
-                    .putString("extra",name);
+            //textSliderView.bundle(new Bundle());
+            //textSliderView.getBundle().putString("extra",name);
 
             mDemoSlider.addSlider(textSliderView);
         }
@@ -108,21 +106,50 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
         get_started_button =(Button)v.findViewById(R.id.get_started_button);
 
 
-        final ScheduledExecutorService executor =
-                Executors.newSingleThreadScheduledExecutor();
+//        final ScheduledExecutorService executor =
+//                Executors.newSingleThreadScheduledExecutor();
+//
+//        Runnable periodicTask = new Runnable() {
+//            public void run() {
+//                Log.d("LOGGED", "periodicTask Executed : ");
+//                // Invoke method(s) to do the work
+//                //doPeriodicWork();
+//                if(MainActivity.app_user_type.equals("Doctor") || MainActivity.app_user_type.equals("Patient")) {
+//                    get_started_button.setText("Lets Get Started !");
+//
+//                    executor.shutdown();
+//                }
+//            }
+//        };
 
-        Runnable periodicTask = new Runnable() {
-            public void run() {
-                // Invoke method(s) to do the work
-                //doPeriodicWork();
-                if(MainActivity.app_user_type.equals("Doctor") || MainActivity.app_user_type.equals("Patient")) {
+        //executor.scheduleAtFixedRate(periodicTask, 0,1, TimeUnit.SECONDS);
+
+
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
+        if(firebaseAuth.getCurrentUser() != null)
+        {
+            User_Email = firebaseAuth.getCurrentUser().getEmail().replace("@","").replace(".","");
+        }
+        //String User_Email = firebaseAuth.getCurrentUser().getEmail().replace("@","").replace(".","");
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("User_Details").child(User_Email);
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String User_Type = dataSnapshot.child("User_Type").getValue(String.class);
+                if(User_Type != null)
+                {
                     get_started_button.setText("Lets Get Started !");
-                    executor.shutdown();
                 }
             }
-        };
 
-        executor.scheduleAtFixedRate(periodicTask, 0,1, TimeUnit.SECONDS);
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
 
         get_started_button.setOnClickListener(new View.OnClickListener() {
@@ -152,19 +179,6 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
 //        });
 
 
-
-
-
-
-
-//        notification.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                sendNotification();
-//            }
-//        });
-
-//        txt = (TextView)v.findViewById(R.id.home_txt1);
 //        Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "fonts/RobotoCondensed-Regular.ttf");
 //        txt.setTypeface(font);
         return v;
@@ -172,7 +186,7 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
 
     @Override
     public void onSliderClick(BaseSliderView slider) {
-        Toast.makeText(getContext(),slider.getBundle().get("extra") + "",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(),slider.getBundle().get("extra") + "",Toast.LENGTH_SHORT).show();
 
     }
 

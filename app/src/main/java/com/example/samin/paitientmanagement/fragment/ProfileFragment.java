@@ -227,6 +227,8 @@ public class ProfileFragment extends Fragment {
                     }
                     mRootRef.child("Name").setValue(mName);
 
+                    mRootRef.child("Name_Present").setValue("YES");
+
                     mRootRef.child("Phone").setValue(mPhone);
 
                     mRootRef.child("Address").setValue(mAddress);

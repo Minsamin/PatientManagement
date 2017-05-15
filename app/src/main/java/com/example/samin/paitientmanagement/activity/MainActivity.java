@@ -1,5 +1,6 @@
 package com.example.samin.paitientmanagement.activity;
 
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -46,11 +48,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.onesignal.OSNotificationAction;
 import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
-
-import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -73,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG_HEALTH_TIPS = "health tips";
     private static final String TAG_PATHOLOGY_LABS = "pathology labs";
     private static final String TAG_BLOOD_BANKS = "blood banks";
+    private static final String TAG_CHAT = "chat";
     public static String CURRENT_TAG = TAG_HOME;
 
     // toolbar titles respected to selected nav menu item
@@ -86,12 +86,11 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser user;
     private static FirebaseDatabase mDatabase;
 
-
     static public String UserID,MainActivityLoaded;
     AlertDialog.Builder builder;
-    String check;
-    String version;
-    public static String app_user_type = "null",LoggedIn_User_Email;
+    String check,version;
+    public static String app_user_type = "null",LoggedIn_User_Email,Fragment_Title;
+    public static int Device_Width;
     private boolean isInForeground=false;
 
 
@@ -294,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
             loadHomeFragment();
 
             if ( getIntent() != null && (getIntent().getFlags() & Intent.FLAG_ACTIVITY_REORDER_TO_FRONT) != 0) {
-                navItemIndex = 7;
+                navItemIndex = 8;
                 CURRENT_TAG = TAG_NOTIFICATIONS;
                 loadHomeFragment();
             }
@@ -305,14 +304,38 @@ public class MainActivity extends AppCompatActivity {
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                navItemIndex = 8;
+                navItemIndex = 9;
                 CURRENT_TAG = TAG_PROFILE;
                 loadHomeFragment();
             }
         });
 
        // Log.d("LOGGED", "ON CREATE COMPLETED : ");
+        //Log.d("LOGGED", "maxMemory : " + Runtime.getRuntime().maxMemory());
+        //Toast.makeText(this, "maxMemory : " + Runtime.getRuntime().maxMemory(), Toast.LENGTH_SHORT).show();
+        //Runtime.getRuntime().maxMemory();
 
+        ActivityManager.MemoryInfo memoryInfo = getAvailableMemory();
+
+        if (!memoryInfo.lowMemory) {
+            //Toast.makeText(this, "Lot of  Memory available on your Device : " + memoryInfo.availMem, Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Toast.makeText(this, "Memory Low on your Device : " + memoryInfo.availMem, Toast.LENGTH_SHORT).show();
+        }
+
+
+        DisplayMetrics metrics = getApplicationContext().getResources().getDisplayMetrics();
+        Device_Width = metrics.widthPixels;
+
+
+    }
+    private ActivityManager.MemoryInfo getAvailableMemory() {
+        ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(memoryInfo);
+        return memoryInfo;
     }
 
     @Override
@@ -332,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot snapshot) {
                         final boolean connected = snapshot.getValue(Boolean.class);
-                        Log.d("LOGGED", "ON CREATE snapshot : " + snapshot.toString());
+                       // Log.d("LOGGED", "ON CREATE snapshot : " + snapshot.toString());
                         if (connected && isInForeground)
                         {
                            // Toast.makeText(getApplicationContext(), "Connected !", Toast.LENGTH_SHORT).show();
@@ -346,7 +369,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(DatabaseError error) {
-                        System.err.println("Listener was cancelled");
+                        //System.err.println("Listener was cancelled");
                     }
                 });
 
@@ -397,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-                Log.d("LOGGED", "User_Type: " +retrieve_type);
+                //Log.d("LOGGED", "User_Type: " +retrieve_type);
                 //HomeFragment hm = new HomeFragment();
 
                 drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
@@ -464,15 +487,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.w("TAGGED", "loadPost:onCancelled", databaseError.toException());
+                //Log.w("TAGGED", "loadPost:onCancelled", databaseError.toException());
             }
         });
 
-        navigationView.getMenu().getItem(7).setActionView(R.layout.menu_dot);
+        navigationView.getMenu().getItem(8).setActionView(R.layout.menu_dot);
 
 
         // final String version = BuildConfig.VERSION_NAME;
-       // mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/Update_APK");
         mRoofRef = FirebaseDatabase.getInstance().getReference().child("Update_APK");
 
 
@@ -481,8 +503,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
                 //System.out.println(dataSnapshot.getValue());
-                //Map<String, String> map = dataSnapshot.getValue(Map.class);
-               // Map<String,String> map = (Map<String, String>) dataSnapshot.getValue();
+
 
               final String retrieve_url = dataSnapshot.child("Download_URL").getValue(String.class);
               final String retrieve_version = dataSnapshot.child("Version").getValue(String.class);
@@ -531,7 +552,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.w("TAGGED", "loadPost:onCancelled", databaseError.toException());
+               // Log.w("TAGGED", "loadPost:onCancelled", databaseError.toException());
             }
         });
     }
@@ -616,8 +637,10 @@ public class MainActivity extends AppCompatActivity {
             case 6:
                 return new BloodBankFragment();
             case 7:
-                return new NotificationFragment();
+                return new AppointmentFragment();
             case 8:
+                return new NotificationFragment();
+            case 9:
                 if(app_user_type.equals("Doctor"))
                 {
                     return new ProfileFragment_Doctor();
@@ -627,7 +650,7 @@ public class MainActivity extends AppCompatActivity {
                     return new ProfileFragment();
                 }
 
-            case 9:
+            case 10:
                 //settings fragment
                 return new SettingsFragment();
             default:
@@ -637,6 +660,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setToolbarTitle() {
         getSupportActionBar().setTitle(activityTitles[navItemIndex]);
+        Fragment_Title = activityTitles[navItemIndex];
     }
 
     private void selectNavMenu() {
@@ -687,17 +711,21 @@ public class MainActivity extends AppCompatActivity {
                         navItemIndex = 6;
                         CURRENT_TAG = TAG_BLOOD_BANKS;
                         break;
+                    case R.id.nav_chat:
+                        navItemIndex = 7;
+                        CURRENT_TAG = TAG_CHAT;
+                        break;
 
                     case R.id.nav_notifications:
-                        navItemIndex = 7;
+                        navItemIndex = 8;
                         CURRENT_TAG = TAG_NOTIFICATIONS;
                         break;
                     case R.id.nav_profile:
-                        navItemIndex = 8;
+                        navItemIndex = 9;
                         CURRENT_TAG = TAG_PROFILE;
                         break;
                     case R.id.nav_settings:
-                        navItemIndex = 9;
+                        navItemIndex = 10;
                         CURRENT_TAG = TAG_SETTINGS;
                         break;
 
@@ -902,12 +930,12 @@ public class MainActivity extends AppCompatActivity {
        // Log.d("LOGGED", "CREATE OPTION MENU: ");
 
         // show menu only when home fragment is selected
-        if (navItemIndex == 0 || navItemIndex==1 || navItemIndex==2 || navItemIndex==3 || navItemIndex==4 || navItemIndex==5 || navItemIndex==7 || navItemIndex==8) {
+        if (navItemIndex == 0 || navItemIndex==1 || navItemIndex==2 || navItemIndex==3 || navItemIndex==4 || navItemIndex==5 || navItemIndex==6 || navItemIndex==7 || navItemIndex==9) {
             getMenuInflater().inflate(R.menu.main, menu);
         }
 
         // when fragment is notifications, load the menu created for notifications
-        if (navItemIndex == 6) {
+        if (navItemIndex == 8) {
             getMenuInflater().inflate(R.menu.notifications, menu);
         }
         return true;
@@ -974,15 +1002,3 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
-
-
-
-
-
-        // Add the following to your AndroidManifest.xml to prevent the launching of your main Activity
-        //   if you are calling startActivity above.
-
-        //<application ...>
-       //   <meta-data android:name="com.onesignal.NotificationOpened.DEFAULT" android:value="DISABLE" />
-      //  </application>
-

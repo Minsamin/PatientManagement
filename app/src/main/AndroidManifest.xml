@@ -53,6 +53,10 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".activity.Blood_Banks_Page"
             android:screenOrientation="portrait"/>
+        <activity android:name=".activity.ChatActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.EnlargeImageView"
+            android:screenOrientation="portrait"/>
 
 
     </application>

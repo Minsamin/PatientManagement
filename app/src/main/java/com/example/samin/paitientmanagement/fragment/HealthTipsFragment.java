@@ -73,7 +73,7 @@ public class HealthTipsFragment extends Fragment {
         mLinearLayoutManager = new LinearLayoutManager(getContext());
         //recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mLinearLayoutManager.setStackFromEnd(true);
-        mLinearLayoutManager.setReverseLayout(true);
+        mLinearLayoutManager.setReverseLayout(false);
 
 
         //recyclerView.setItemAnimator(animation);

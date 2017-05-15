@@ -15,6 +15,7 @@
     <string name="nav_health">Health Tips</string>
     <string name="nav_patho">Pathology Labs</string>
     <string name="nav_blood">Blood Banks</string>
+    <string name="nav_chat">Chat</string>
 
 
     <!-- Toolbar titles when navigation menu item is selected -->
@@ -26,9 +27,12 @@
         <item>Health Tips</item>
         <item>Pathology Labs</item>
         <item>Blood Banks</item>
+        <item>Chat</item>
         <item>Notifications</item>
-        <item>Settings</item>
         <item>Profile</item>
+        <item>Settings</item>
+
+
     </string-array>
 
 
@@ -176,23 +180,6 @@
         This privacy policy gives you information as to the types of personal information we collect, how we use that information and whom we may share it with.
     </string>
 
-
-    <string name="home_test_text">Tata Main Hospital, the Medical Division of Tata Steel and its nine dispensaries at Jamshedpur provide curative healthcare services to the employees of Tata Steel and their families free of cost.
-        Apart from TMH and the dispensaries, out-location hospitals are located at Jamadoba, Noamundi and Sukhinda Mines and West Bokaro Collieries.
-        TMH also extends its facilities to non-entitled patients from Jamshedpur and its surrounding area.Tata Main Hospital, the Medical Division of Tata Steel
-        and its nine dispensaries at Jamshedpur provide curative healthcare services to the employees
-        of Tata Steel and their families free of cost.
-        Apart from TMH and the dispensaries, out-location hospitals are located at Jamadoba, Noamundi and Sukhinda Mines and West Bokaro Collieries.
-        TMH also extends its facilities to non-entitled patients from Jamshedpur and its surrounding area.Tata Main Hospital, the Medical Division of Tata Steel
-        and its nine dispensaries at Jamshedpur provide curative healthcare services to the employees
-        of Tata Steel and their families free of cost. Apart from TMH
-        and the dispensaries, out-location hospitals are located at Jamadoba, Noamundi and Sukhinda Mines and West Bokaro Collieries. TMH also extends its facilities to non-entitled patients from Jamshedpur and its surrounding area.
-        Tata Main Hospital, the Medical Division of Tata Steel and its nine dispensaries at Jamshedpur provide curative healthcare services to the employees of Tata Steel and their families free of cost. Apart from TMH and the dispensaries,
-        out-location hospitals are located at Jamadoba, Noamundi and Sukhinda Mines and West Bokaro Collieries. TMH also extends its facilities to non-entitled patients from Jamshedpur and its surrounding area.Tata Main Hospital, the Medical Division
-        of Tata Steel and its nine dispensaries at Jamshedpur provide curative healthcare services to the employees of Tata Steel and their families free of cost. Apart from TMH and the dispensaries, out-location hospitals are located
-        at Jamadoba, Noamundi and Sukhinda Mines and West Bokaro Collieries. TMH also extends its facilities to non-entitled patients from Jamshedpur and its surrounding area. Tata Main Hospital, the Medical Division of Tata Steel and its nine dispensaries
-        at Jamshedpur provide curative healthcare services to the employees of Tata Steel and their families free of cost. Apart from TMH and the dispensaries, out-location hospitals are located at Jamadoba, Noamundi and Sukhinda Mines and West Bokaro Collieries.
-        TMH also extends its facilities to non-entitled patients from Jamshedpur and its surrounding area.</string>
     <string name="demo">DEMO</string>
     <string name="desc">Content Description</string>
     <string name="Null">NULL</string>

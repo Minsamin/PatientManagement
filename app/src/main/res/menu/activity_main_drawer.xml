@@ -33,6 +33,10 @@
             android:id="@+id/nav_bloodbank"
             android:icon="@drawable/blood_bank_icon"
             android:title="@string/nav_blood" />
+        <item
+            android:id="@+id/nav_chat"
+            android:icon="@drawable/health_tips_icon"
+            android:title="@string/nav_chat" />
 
         <item
             android:id="@+id/nav_notifications"

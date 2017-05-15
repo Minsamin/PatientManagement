@@ -227,7 +227,7 @@ public class Show_Appointments extends AppCompatActivity {
                     viewHolder.setAppointment_Date(model.getAppointment_Date());
                     viewHolder.setAppointment_Reason(model.getAppointment_Reason());
                     final String PATIENT_EMAIL = model.getPatient_Email();
-                    final String DOCTOR_EMAIL = model.getAppointment_Doctor_Email();
+                    //final String DOCTOR_EMAIL = model.getAppointment_Doctor_Email();
                     viewHolder.setPatient_Image(model.getPatient_Email());
                     viewHolder.setAppointment_Request_Status_doctor(model.getRequest_Status());
 

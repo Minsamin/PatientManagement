@@ -123,33 +123,33 @@ public class NotificationFragment extends Fragment {
 
             }
         });
-        recyclerView.setAdapter(mFirebaseAdapter);
-
-        mRootRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
-            @Override
-            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-                //Log.d("LOGGED", "I Called Yahoo ");
-                if(dataSnapshot.hasChildren())
-                {
-                    //Log.d("LOGGED", "Boolean value true: ");
-                    progressBar.setVisibility(ProgressBar.INVISIBLE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                }
-                else {
-                    progressBar.setVisibility(ProgressBar.INVISIBLE);
-                    recyclerView.setVisibility(View.INVISIBLE);
-                    noDataAvailableImage.setVisibility(View.VISIBLE);
-                    Toast.makeText(getContext(), "Data Unavailable", Toast.LENGTH_SHORT).show();
-                    //Log.d("LOGGED", "Boolean value false: ");
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+//        recyclerView.setAdapter(mFirebaseAdapter);
+//
+//        mRootRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+//            @Override
+//            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+//                //Log.d("LOGGED", "I Called Yahoo ");
+//                if(dataSnapshot.hasChildren())
+//                {
+//                    //Log.d("LOGGED", "Boolean value true: ");
+//                    progressBar.setVisibility(ProgressBar.INVISIBLE);
+//                    recyclerView.setVisibility(View.VISIBLE);
+//                }
+//                else {
+//                    progressBar.setVisibility(ProgressBar.INVISIBLE);
+//                    recyclerView.setVisibility(View.INVISIBLE);
+//                    noDataAvailableImage.setVisibility(View.VISIBLE);
+//                    Toast.makeText(getContext(), "Data Unavailable", Toast.LENGTH_SHORT).show();
+//                    //Log.d("LOGGED", "Boolean value false: ");
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
 
     }
 
@@ -196,11 +196,6 @@ public class NotificationFragment extends Fragment {
             post_notification_image = (ImageView) mView.findViewById(R.id.notification_image);
 
         }
-        //set_notification_image
-        //set_notification_date
-        //set_notification_time
-        //set_notification_text
-
 
         private void set_notification_date(String title) {
             post_date.setText(title);
@@ -223,7 +218,7 @@ public class NotificationFragment extends Fragment {
                         .load(title)
                         .thumbnail(0.5f)
                         .crossFade()
-                        .placeholder(R.drawable.loading)
+                        .placeholder(R.drawable.default_avatar_large)
                         .bitmapTransform(new CircleTransform(itemView.getContext()))
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(post_notification_image);
