@@ -3,17 +3,21 @@ package com.example.samin.paitientmanagement.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,19 +43,18 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static java.security.AccessController.getContext;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 public class ChatActivity extends AppCompatActivity {
@@ -67,9 +70,15 @@ public class ChatActivity extends AppCompatActivity {
     private static final int GALLERY_INTENT = 2;
     private ProgressDialog mProgressDialog;
     ProgressBar progressBar;
-    public static final int READ_EXTERNAL_STORAGE = 0;
+    public static final int READ_EXTERNAL_STORAGE = 0,MULTIPLE_PERMISSIONS = 10;
     Uri mImageUri = Uri.EMPTY;
     TextView no_chat;
+    private String pictureImagePath = "";
+    final CharSequence[] options = {"Camera", "Gallery"};
+    String[] permissions= new String[]{
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA,};
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,7 +90,6 @@ public class ChatActivity extends AppCompatActivity {
         myRef = FirebaseDatabase.getInstance().getReference().child("Chat").child(USER_ID).child(getIntent().getStringExtra("email").replace("@","").replace(".",""));
         myRef.keepSynced(true);
 
-        //reference1 = FirebaseDatabase.getInstance().getReference().child("Chat").child(USER_ID).child(getIntent().getStringExtra("email").replace("@","").replace(".",""));
         myRef2 = FirebaseDatabase.getInstance().getReference().child("Chat").child(getIntent().getStringExtra("email").replace("@","").replace(".","")).child(USER_ID);
         myRef2.keepSynced(true);
 
@@ -127,12 +135,6 @@ public class ChatActivity extends AppCompatActivity {
                     recyclerView.postDelayed(new Runnable() {
                         @Override public void run()
                         {
-                            // Toast.makeText(ChatActivity.this, "Executing", Toast.LENGTH_SHORT).show();
-                            //recyclerView.scrollTo(0,recyclerView.getScrollY()+20);
-                            //Log.d("LOGGED", " findLastCompletelyVisibleItemPosition " + (mLinearLayoutManager.findLastCompletelyVisibleItemPosition() -1));
-                            //Log.d("LOGGED", " getItemCount " + (mLinearLayoutManager.getItemCount()));
-                            //Log.d("LOGGED", " getAdapter + getItemCount " + (recyclerView.getAdapter().getItemCount()-1));
-                            //recyclerView.scrollToPosition(mLinearLayoutManager.getItemCount()+1);
                             recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount()-1);
 
                         }
@@ -153,29 +155,177 @@ public class ChatActivity extends AppCompatActivity {
 //
 //                    callgalary();
 //                }
-                if (ContextCompat.checkSelfPermission(ChatActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(ChatActivity.this, "Call for Permission", Toast.LENGTH_SHORT).show();
-                    ActivityCompat.requestPermissions(ChatActivity.this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
-                } else {
 
-                    callgalary();
-                }
+                AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this);
+                builder.setTitle("Choose Source ");
+                builder.setItems(options, new DialogInterface.OnClickListener()
+                {
+                            @Override
+                            public void onClick(DialogInterface dialog, int item) {
+                                if (options[item].equals("Camera"))
+                                {
+                                    if (checkPermissions())
+                                    {
+                                        callCamera();
+                                    }
+
+//                                    if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+//                                            ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+//                                    {
+//                                        if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+//                                        {
+//                                            Log.d("LOGGED", "REQUEST FOR CAMERA ");
+//                                            ActivityCompat.requestPermissions(ChatActivity.this,
+//                                                    new String[]{Manifest.permission.CAMERA}, CAMERA);
+//                                            return;
+//                                        }
+//
+//                                        if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+//                                        {
+//                                            Log.d("LOGGED", "REQUEST FOR READ_EXTERNAL_STORAGE ");
+//                                            ActivityCompat.requestPermissions(ChatActivity.this,
+//                                                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
+//                                        }
+//                                    }
+//                                    else
+//                                    {
+//                                        callCamera();
+//
+//                                    }
+
+                                }
+                                if(options[item].equals("Gallery"))
+                                {
+                                    if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                                    {
+                                        //Log.d("LOGGED", "REQUEST FOR READ_EXTERNAL_STORAGE ");
+                                        ActivityCompat.requestPermissions(ChatActivity.this,
+                                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
+                                        //new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
+                                    }
+                                    else
+                                    {
+                                        callgalary();
+                                    }
+                                }
+
+                            }
+
+                });
+                    builder.show();
+
+
+
+//
+//                //READ_EXTERNAL_STORAGE
+//                if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+//                        ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//
+//
+//                    //Toast.makeText(ChatActivity.this, "Call for Permission", Toast.LENGTH_SHORT).show();
+//                    if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+//                    {
+//                        Log.d("LOGGED", "REQUEST FOR CAMERA ");
+//                        ActivityCompat.requestPermissions(ChatActivity.this,
+//                                new String[]{Manifest.permission.CAMERA}, CAMERA);
+//                        return;
+//                    }
+//
+//                    if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+//                    {
+//                        Log.d("LOGGED", "REQUEST FOR READ_EXTERNAL_STORAGE ");
+//                        ActivityCompat.requestPermissions(ChatActivity.this,
+//                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
+//                        //new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
+//                    }
+//
+//                   // new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
+//
+//
+//                else if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+//                {
+//                    Toast.makeText(ChatActivity.this, "Call for Permission", Toast.LENGTH_SHORT).show();
+//                    Log.d("LOGGED", "NO ONE CALLED ME");
+//                    ActivityCompat.requestPermissions(ChatActivity.this,
+//                            new String[]{Manifest.permission.CAMERA}, READ_EXTERNAL_STORAGE);
+//                    //new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
+//                }
+//
+//            }
+//                    else {
+//                Log.d("LOGGED", "ALl PERMISSION APPROVED ");
+//                //callgalary();
+//                callCamera();
+//            }
+
+
+
             }
         });
 
-
-
-
     }
+
+
+    private  boolean checkPermissions() {
+        int result;
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        for (String p:permissions) {
+            result = ContextCompat.checkSelfPermission(getApplicationContext(),p);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p);
+            }
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),MULTIPLE_PERMISSIONS );
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case READ_EXTERNAL_STORAGE:
+                //Toast.makeText(getContext(), "Call Req Prmssn", Toast.LENGTH_SHORT).show();
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    //Log.d("LOGGED", "GRANT - READ_EXTERNAL_STORAGE ");
+                    // Toast.makeText(getContext(), "Inside If", Toast.LENGTH_SHORT).show();
+                    callgalary();
+                return;
+//            case CAMERA:
+//                //Toast.makeText(getContext(), "Call Req Prmssn", Toast.LENGTH_SHORT).show();
+//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+//                    Log.d("LOGGED", "GRANT - CAMERA ");
+//                    // Toast.makeText(getContext(), "Inside If", Toast.LENGTH_SHORT).show();
+//                    //callCamera();
+//                return;
+
+
+            case MULTIPLE_PERMISSIONS:{
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    // permissions granted.
+                    callCamera();
+                }
+                //else {
+                    // no permissions granted.
+                //}
+                //return;
+            }
+
+        }
+        //callCamera();
+       // Toast.makeText(getApplicationContext(), "...", Toast.LENGTH_SHORT).show();
+    }
+
 
 
 
     @Override
     public void onStart() {
         super.onStart();
-        //Log.d("LOGGED", "IN onStart ");
+        Log.d("LOGGED", "IN onStart ");
         mFirebaseAdapter = new FirebaseRecyclerAdapter<Show_chat_data_item, ChatActivity.ChatDetailsViewHolder>(Show_chat_data_item.class, R.layout.show_chat_single_item, ChatActivity.ChatDetailsViewHolder.class, myRef) {
 
 
@@ -203,8 +353,6 @@ public class ChatActivity extends AppCompatActivity {
                                     intent.putExtra("url",retrieve_image_url);
                                     startActivity(intent);
                                 }
-
-
                             }
 
                             @Override
@@ -232,20 +380,12 @@ public class ChatActivity extends AppCompatActivity {
                     recyclerView.setVisibility(View.VISIBLE);
                     no_data_available_image.setVisibility(View.GONE);
                     no_chat.setVisibility(View.GONE);
-
-
-
-
                     recyclerView.postDelayed(new Runnable() {
                         @Override public void run()
                         {
                             recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount()-1);
                         }
                     }, 500);
-
-
-
-
                     recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                         @Override
                         public void onLayoutChange(View v,
@@ -306,6 +446,7 @@ public class ChatActivity extends AppCompatActivity {
     public static class ChatDetailsViewHolder extends RecyclerView.ViewHolder {
         private final TextView message, sender;
         private final ImageView chat_image_incoming,chat_image_outgoing;
+        //static  ImageView outgoing = null;
         View mView;
         final LinearLayout.LayoutParams params,text_params;
         LinearLayout layout;
@@ -318,12 +459,11 @@ public class ChatActivity extends AppCompatActivity {
             sender = (TextView) mView.findViewById(R.id.fetch_chat_sender);
             chat_image_incoming = (ImageView) mView.findViewById(R.id.chat_uploaded_image_incoming);
             chat_image_outgoing = (ImageView) mView.findViewById(R.id.chat_uploaded_image_outgoing);
+
+            //outgoing = (ImageView) mView.findViewById(R.id.chat_uploaded_image_outgoing);
             params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             text_params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             layout = (LinearLayout) mView.findViewById(R.id.chat_linear_layout);
-
-
-
         }
 
         private void getSender(String title) {
@@ -432,13 +572,17 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d("LOGGED", "InSIDE onActivityResult : ");
+        Log.d("LOGGED", " requestCode : " + requestCode+" resultCode : " + resultCode+" DATA "+data);
 
         if (requestCode == GALLERY_INTENT && resultCode == RESULT_OK) {
 
             mImageUri = data.getData();
             StorageReference filePath = FirebaseStorage.getInstance().getReference().child("Chat_Images").child(mImageUri.getLastPathSegment());
-            //Log.d("LOGGED", "ImageURI : " +mImageUri);
+            Log.d("LOGGED", "ImageURI : " +mImageUri); //ImageURI : content://com.google.android.apps.photos.contentprovider/-1/1/content%3A%2F%2Fmedia%2Fexternal%2Ffile%2F82/ORIGINAL/NONE/2125308810
             //the Progress bar Should be Here
+
+
             mProgressDialog.setMessage("Uploading...");
             mProgressDialog.show();
 
@@ -446,14 +590,7 @@ public class ChatActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     @SuppressWarnings("VisibleForTests") Uri downloadUri = taskSnapshot.getDownloadUrl();
-                    //reference1.child("message").setValue(downloadUri.toString());
 
-//                    Glide.with(getApplicationContext())
-//                            .load(downloadUri)
-//                            .crossFade()
-//                            .placeholder(R.drawable.loading)
-//                            .diskCacheStrategy(DiskCacheStrategy.RESULT)
-//                            .into(imageView);
                     ArrayMap<String, String> map = new ArrayMap<>();
                     map.put("message", downloadUri.toString());
                     map.put("sender", MainActivity.LoggedIn_User_Email);
@@ -466,27 +603,100 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
         }
+
+        if (requestCode == 5 && resultCode == Activity.RESULT_OK) {
+
+
+
+            File imgFile = new  File(pictureImagePath);
+            if(imgFile.exists()) {
+                Log.d("LOGGED", "imgFile : " + imgFile);
+
+                Uri fileUri =Uri.fromFile(imgFile);
+                Log.d("LOGGED", "fileUri : " + fileUri);
+
+                StorageReference filePath = FirebaseStorage.getInstance().getReference().child("Chat_Images").child(fileUri.getLastPathSegment());
+
+                mProgressDialog.setMessage("Uploading...");
+                mProgressDialog.show();
+
+                filePath.putFile(fileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    @SuppressWarnings("VisibleForTests") Uri downloadUri = taskSnapshot.getDownloadUrl();
+                    ArrayMap<String, String> map = new ArrayMap<>();
+                    map.put("message", downloadUri.toString());
+                    map.put("sender", MainActivity.LoggedIn_User_Email);
+                    myRef.push().setValue(map);
+                    myRef2.push().setValue(map);
+
+                    mProgressDialog.dismiss();
+                }
+            });
+            }
+        }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case READ_EXTERNAL_STORAGE:
-                //Toast.makeText(getContext(), "Call Req Prmssn", Toast.LENGTH_SHORT).show();
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    // Toast.makeText(getContext(), "Inside If", Toast.LENGTH_SHORT).show();
-                    callgalary();
-                return;
-        }
-        Toast.makeText(getApplicationContext(), "...", Toast.LENGTH_SHORT).show();
-    }
+//    public Uri getImageUri(Context inContext, Bitmap inImage) {
+//        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+//        inImage.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+//        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+//        return Uri.parse(path);
+//    }
+//    public String getRealPathFromURI(Uri uri) {
+//        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+//        cursor.moveToFirst();
+//        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+//        return cursor.getString(idx);
+//    }
+
+
+
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         //Glide.clear(imageView);
         Glide.get(getApplicationContext()).clearMemory();
+    }
+
+    private void callCamera() {
+        //Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+//        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+//
+//        //Uri uri  = Uri.parse("file:///sdcard/photo.jpg");
+//        //Uri uri2  = Uri.parse( Environment.getExternalStorageDirectory().getPath().concat("/photo.jpg"));
+//        Log.d("LOGGED", "IMAGE callCamera : " + intent.toString());
+//        //intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri2);
+//
+//        startActivityForResult(intent, 5);
+
+
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = timeStamp + ".jpg";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        pictureImagePath = storageDir.getAbsolutePath() + "/" + imageFileName;
+        Log.d("LOGGED", "pictureImagePath : " + pictureImagePath);
+
+        File file = new File(pictureImagePath);
+
+        //Uri photoURI = Uri.fromFile(createImageFile());
+
+        Uri outputFileUri = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getApplicationContext().getPackageName() + ".provider", file);
+        Log.d("LOGGED", "outputFileUri : " + outputFileUri);
+        Log.d("LOGGED", "file : " + file);
+
+        //Uri outputFileUri = Uri.fromFile(file);
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+        cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivityForResult(cameraIntent, 5);
+
+
+
+
     }
 
 

@@ -73,6 +73,13 @@
     <string name="about_ok">OK</string>
 
     <string name="changelog_body">
+
+        <b><u>PM 2.7 - Changes:</u></b>\n
+
+        &#8226; Health Tips Working. \n
+        &#8226; Chat Implemented. with Image Support. \n
+        &#8226; Some Blood Banks Details Added. \n\n
+
         <b><u>PM 2.6 - Changes:</u></b>\n
 
         &#8226; Patients will get Notification if Doctor Approve his Appointment. \n
