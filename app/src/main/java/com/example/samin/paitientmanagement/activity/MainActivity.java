@@ -48,8 +48,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.onesignal.OSNotificationAction;
 import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
+
+import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -977,28 +980,57 @@ public class MainActivity extends AppCompatActivity {
         // This fires when a notification is opened by tapping on it.
         @Override
         public void notificationOpened(OSNotificationOpenResult result) {
-//            OSNotificationAction.ActionType actionType = result.action.type;
-//            JSONObject data = result.notification.payload.additionalData;
-//            String customKey="NULL";
-//
-//            Log.d("LOGGED", "JSONObject data: " + data);
-//
-//            if (data != null) {
-//                customKey = data.optString("customkey", null);
-//                if (customKey != null)
-//                    Log.i("OneSignalExample", "customkey set with value: " + customKey);
-//            }
-//            Log.d("LOGGED", "JSONObject data: " + data);
-//            Log.d("LOGGED", "customKey data: " + customKey);
-//            Log.d("LOGGED", "actionType data: " + actionType);
-//
+            //OSNotificationAction.ActionType actionType = result.action.type;
+            JSONObject data = result.notification.payload.additionalData;
+            String customKey;
+            if (data != null) {
+                customKey = data.optString("Data", null);
+                if (customKey != null)
+                {
+                    Log.d("LOGGED", "notificationOpened: " +  customKey);
+                    if(customKey.equals("Notification"))
+                    {
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                    else
+                    {
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                    //Toast.makeText(MainActivity.this, "Value is : " + customKey, Toast.LENGTH_SHORT).show();
+                }
+            }
+
 //            if (actionType == OSNotificationAction.ActionType.ActionTaken)
-//                Log.i("OneSignalExample", "Button pressed with id: " + result.action.actionID);
+//                Log.d("LOGGED", "Button pressed with id: " + result.action.actionID);
+
+
+
+
+
             // The following can be used to open an Activity of your choice.
             // Replace - getApplicationContext() - with any Android Context.
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
+//            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(intent);
+
+
+            //Put it to MainActivity OnCreate
+//            if (savedInstanceState == null) {
+//                navItemIndex = 0;
+//                CURRENT_TAG = TAG_HOME;
+//                loadHomeFragment();
+//
+//                if ( getIntent() != null && (getIntent().getFlags() & Intent.FLAG_ACTIVITY_REORDER_TO_FRONT) != 0) {
+//                    navItemIndex = 8;
+//                    CURRENT_TAG = TAG_NOTIFICATIONS;
+//                    loadHomeFragment();
+//                }
+//            }
+
         }
     }
 }

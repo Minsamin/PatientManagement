@@ -1,10 +1,16 @@
 package com.example.samin.paitientmanagement.fragment;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ShareCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +30,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.samin.paitientmanagement.R;
+import com.example.samin.paitientmanagement.activity.ChatActivity;
+import com.example.samin.paitientmanagement.activity.MainActivity;
 import com.example.samin.paitientmanagement.other.Show_health_tips_data_item;
 import com.example.samin.paitientmanagement.other.Show_pathology_data_item;
 import com.firebase.ui.database.ChangeEventListener;
@@ -35,6 +43,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
 import java.net.URL;
 
 
@@ -42,7 +51,7 @@ public class HealthTipsFragment extends Fragment {
     RecyclerView recyclerView;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference myRef;
-    private static FirebaseRecyclerAdapter<Show_health_tips_data_item, HealthTipsFragment.HealthTipsDetailsViewHolder> mFirebaseAdapter;
+    private static FirebaseRecyclerAdapter<Show_health_tips_data_item, HealthTipsDetailsViewHolder> mFirebaseAdapter;
     private FirebaseAuth firebaseAuth;
     private static String userID;
     private LinearLayoutManager mLinearLayoutManager;
@@ -89,9 +98,8 @@ public class HealthTipsFragment extends Fragment {
     public void onStart() {
         super.onStart();
         //Log.d("LOGGED", "IN onStart ");
-        mFirebaseAdapter = new FirebaseRecyclerAdapter<Show_health_tips_data_item, HealthTipsFragment.HealthTipsDetailsViewHolder>(Show_health_tips_data_item.class, R.layout.show_health_tips_single_item, HealthTipsFragment.HealthTipsDetailsViewHolder.class, myRef)
-        {
-
+        mFirebaseAdapter = new FirebaseRecyclerAdapter<Show_health_tips_data_item, HealthTipsDetailsViewHolder>(
+                Show_health_tips_data_item.class, R.layout.show_health_tips_single_item, HealthTipsDetailsViewHolder.class, myRef) {
 
 
 //            @Override
@@ -129,87 +137,145 @@ public class HealthTipsFragment extends Fragment {
 //            }
 
 
-
-
-            public void populateViewHolder(final HealthTipsFragment.HealthTipsDetailsViewHolder viewHolder,final Show_health_tips_data_item model, final int position) {
+            public void populateViewHolder(final HealthTipsDetailsViewHolder viewHolder, final Show_health_tips_data_item model, final int position) {
                 //Log.d("LOGGED", "IN populateViewHolder ");
 
-                viewHolder.Thank_counter(model.getThank_counter(),mFirebaseAdapter.getRef(position));
+                viewHolder.Thank_counter(model.getThank_counter(), mFirebaseAdapter.getRef(position));
                 viewHolder.Post_about(model.getPost_about());
                 viewHolder.Post_date(model.getPost_date());
                 viewHolder.Post_title(model.getPost_title());
                 viewHolder.Posted_by(model.getPosted_by());
                 viewHolder.Post_image(model.getPost_image());
                 viewHolder.Doctor_email(model.getDoctor_email());
-                viewHolder.Thank_Person(model.getThank_person(),mFirebaseAdapter.getRef(position));
+                viewHolder.Thank_Person(model.getThank_person(), mFirebaseAdapter.getRef(position));
+
+
+
+                viewHolder.post_share.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        String Share_Title = model.getPost_title();
+                        String Share_About = model.getPost_about();
+                        Intent shareIntent = ShareCompat.IntentBuilder.from(getActivity())
+                                .setType("text/plain")
+                                .setText(Share_Title + "\n \n \n" + Share_About)
+                                .getIntent();
+
+                        if (shareIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                            startActivity(shareIntent);
+                        }
+                    }
+                });
+
+
+                viewHolder.post_consult.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        DatabaseReference ref = mFirebaseAdapter.getRef(position);
+                        Log.d("LOGGED", "DatabaseReference_Contact:  " + ref);
+                        //Toast.makeText(viewHolder.itemView.getContext(), "REFERENCE "+ ref, Toast.LENGTH_SHORT).show();
+                        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                String Doctor_email = dataSnapshot.child("Doctor_email").getValue(String.class);
+
+                                if(MainActivity.LoggedIn_User_Email.replace("@","").replace(".","").equals(Doctor_email))
+                                {
+                                    Toast.makeText(getContext(), "Its Your Post", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    //String Patient_name = dataSnapshot.child("Patient_Name").getValue(String.class);
+                                    //Toast.makeText(viewHolder.itemView.getContext(), "Patient_Email:  "+ Patient_name, Toast.LENGTH_SHORT).show();
+
+                                    DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference().child("Doctor_Detais").child(Doctor_email);
+                                    ref2.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            String Doctor_Email = dataSnapshot.child("Email").getValue(String.class);
+                                            String Doctor_Name = dataSnapshot.child("Name").getValue(String.class);
+                                            Intent intent = new Intent(viewHolder.itemView.getContext(), ChatActivity.class);
+                                            //intent.putExtra("image_id",retrieve_url);
+                                             intent.putExtra("email",Doctor_Email);
+                                            intent.putExtra("name",Doctor_Name);
+                                            getContext().startActivity(intent);
+
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                });
+
+
+
+
+
                 //my_position = position;
-               }
-
-            @Override
-            protected void onDataChanged() {
-                super.onDataChanged();
-
-                Log.d("LOGGED", "IN onDataChanged ");
-                //mLinearLayoutManager.scrollToPosition(my_position);
-                //recyclerView.scrollToPosition(my_position);
-
-            }
-        };
 
 
-
-
-
-
-
-
-        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-//            @Override
-//            public void onItemRangeInserted(int positionStart, int itemCount) {
-//                super.onItemRangeInserted(positionStart, itemCount);
-//                int friendlyMessageCount = mFirebaseAdapter.getItemCount();
-//                int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
-//                Log.d("LOGGED", "friendlyMessageCount " + friendlyMessageCount);
-//                Log.d("LOGGED", "lastVisiblePosition " + lastVisiblePosition);
-//                // If the recycler view is initially being loaded or the
-//                // user is at the bottom of the list, scroll to the bottom
-//                // of the list to show the newly added message.
-//                if (lastVisiblePosition == -1 ||
-//                        (positionStart >= (friendlyMessageCount - 1) &&
-//                                lastVisiblePosition == (positionStart - 1))) {
-//                    //recyclerView.scrollToPosition(positionStart);
-//                    recyclerView.smoothScrollToPosition(my_position);
-//                    //Log.d("logged", "scrollToPosition: " + my_position);
-//                }
-//                recyclerView.smoothScrollToPosition(my_position);
+//        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver()
+//
+//            {
+////            @Override
+////            public void onItemRangeInserted(int positionStart, int itemCount) {
+////                super.onItemRangeInserted(positionStart, itemCount);
+////                int friendlyMessageCount = mFirebaseAdapter.getItemCount();
+////                int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+////                Log.d("LOGGED", "friendlyMessageCount " + friendlyMessageCount);
+////                Log.d("LOGGED", "lastVisiblePosition " + lastVisiblePosition);
+////                // If the recycler view is initially being loaded or the
+////                // user is at the bottom of the list, scroll to the bottom
+////                // of the list to show the newly added message.
+////                if (lastVisiblePosition == -1 ||
+////                        (positionStart >= (friendlyMessageCount - 1) &&
+////                                lastVisiblePosition == (positionStart - 1))) {
+////                    //recyclerView.scrollToPosition(positionStart);
+////                    recyclerView.smoothScrollToPosition(my_position);
+////                    //Log.d("logged", "scrollToPosition: " + my_position);
+////                }
+////                recyclerView.smoothScrollToPosition(my_position);
+////
+////            }
+//                @Override
+//                public void onChanged () {
+//                super.onChanged();
+//                Log.d("LOGGED", "onChanged ");
+//                //recyclerView.smoothScrollToPosition(my_position);
 //
 //            }
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                Log.d("LOGGED", "onChanged " );
-                //recyclerView.smoothScrollToPosition(my_position);
-
+//            });
+                // Log.d("LOGGED", "IN setAdapter ");
             }
-        });
-       // Log.d("LOGGED", "IN setAdapter ");
+
+        };
         recyclerView.setLayoutManager(mLinearLayoutManager);
         recyclerView.setAdapter(mFirebaseAdapter);
 
 
-        //recyclerView.setAnimation
 
     }
-
-
-
 
     //View Holder For Recycler View
     public static class HealthTipsDetailsViewHolder extends RecyclerView.ViewHolder {
         private final TextView  Post_about, Post_date, Post_title, Posted_by, Thank_counter,post_consult,post_share,doctor_qualification,doctor_address;
         private final ImageView Post_image,post_thank_image,doctor_image;
-        // private final TextView  pathology_website, pathology_direction,
-       // private final LinearLayout website,direction;
+
         View mView;
 
         public HealthTipsDetailsViewHolder(final View itemView) {
@@ -245,7 +311,8 @@ public class HealthTipsFragment extends Fragment {
             post_share.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(mView.getContext(), "Not Implemented Yet", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mView.getContext(), "Not Implemented Yet", Toast.LENGTH_SHORT).show();
+
                 }
             });
 

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Image;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -230,6 +231,73 @@ public class Show_Appointments extends AppCompatActivity {
                     //final String DOCTOR_EMAIL = model.getAppointment_Doctor_Email();
                     viewHolder.setPatient_Image(model.getPatient_Email());
                     viewHolder.setAppointment_Request_Status_doctor(model.getRequest_Status());
+
+
+
+
+
+
+
+                    viewHolder.contact_image_view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                           // Toast.makeText(viewHolder.itemView.getContext(), "adapterPosition_Contact Clicked"+ position, Toast.LENGTH_SHORT).show();
+                            DatabaseReference ref = mFirebaseAdapter.getRef(position);
+                            Log.d("LOGGED", "DatabaseReference_Contact:  " + ref);
+                            //Toast.makeText(viewHolder.itemView.getContext(), "REFERENCE "+ ref, Toast.LENGTH_SHORT).show();
+                            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    String Patient_Phone = dataSnapshot.child("Patient_Phone").getValue(String.class);
+                                    //Toast.makeText(viewHolder.itemView.getContext(), "Patient_Phone:  "+ Patient_Phone, Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                                    intent.setData(Uri.parse("tel:"+Patient_Phone));
+                                    startActivity(intent);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    });
+
+                    viewHolder.message_image_view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                           // Toast.makeText(viewHolder.itemView.getContext(), "adapterPosition_Contact Clicked"+ position, Toast.LENGTH_SHORT).show();
+                            DatabaseReference ref = mFirebaseAdapter.getRef(position);
+                           // Toast.makeText(viewHolder.itemView.getContext(), "REFERENCE "+ ref, Toast.LENGTH_SHORT).show();
+                            Log.d("LOGGED", "DatabaseReference_Message:  " + ref);
+                            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    String Patient_email = dataSnapshot.child("Patient_Email").getValue(String.class);
+                                    String Patient_name = dataSnapshot.child("Patient_Name").getValue(String.class);
+                                    //Toast.makeText(viewHolder.itemView.getContext(), "Patient_Email:  "+ Patient_name, Toast.LENGTH_SHORT).show();
+
+                                     Intent intent = new Intent(viewHolder.itemView.getContext(), ChatActivity.class);
+                                    //intent.putExtra("image_id",retrieve_url);
+                                    intent.putExtra("email",Patient_email);
+                                    intent.putExtra("name",Patient_name);
+                                   getApplicationContext().startActivity(intent);
+
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    });
+
+
+
+
+
 
 
                     //Log.d("LOGGED", "populateViewHolder: Called ");
@@ -486,7 +554,7 @@ public class Show_Appointments extends AppCompatActivity {
                                 " \"relation\": \"=\", " +
                                 "\"value\": \"" + Patient_Email_ID + "\"}],"
 
-                                + "\"data\": {\"foo\": \"bar\"},"
+                                + "\"data\": {\"Data\": \"Notification\"},"
                                 + "\"headings\": {\"en\": \"Your Appointment is Approved\"},"
                                 //+ "\"big_picture\": \"" + R.drawable.logo_pms + "\","
                                 + "\"large_icon\": \"" + R.drawable.logo_pms + "\","
@@ -573,15 +641,14 @@ public class Show_Appointments extends AppCompatActivity {
     //View Holder For Recycler View
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         private final TextView post_doctor_name, post_doctor_email, post_doctor_phone, post_patient_name, post_patient_phone, post_appointment_date, post_appointment_reason;
-        private final ImageView post_doctor_image,post_appointment_status,post_appointment_status_doctor;
+        private final ImageView post_doctor_image,post_appointment_status,post_appointment_status_doctor,contact_image_view,message_image_view;
         View mView;
         //Firebase mRoofRef;
-        RecyclerView.ViewHolder vv;
 
         public MyViewHolder(final View itemView) {
 
             super(itemView);
-            Log.d("LOGGED", "ViewHolder Called: " );
+            //Log.d("LOGGED", "ViewHolder Called: " );
             mView = itemView;
             post_doctor_name = (TextView) mView.findViewById(R.id.fetch_doctor_name);
             post_doctor_email = (TextView) mView.findViewById(R.id.fetch_doctor_email);
@@ -593,14 +660,50 @@ public class Show_Appointments extends AppCompatActivity {
             post_doctor_image = (ImageView) mView.findViewById(R.id.show_appointment_doctor_image);
             post_appointment_status = (ImageView) mView.findViewById(R.id.fetch_doctor_approval);
             post_appointment_status_doctor = (ImageView) mView.findViewById(R.id.show_appointment_appointment_status);
+            contact_image_view = (ImageView) mView.findViewById(R.id.contact_image_view);
+            message_image_view = (ImageView) mView.findViewById(R.id.message_image_view);
+
+
+
+
+
+//            contact_image_view.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    //Toast.makeText(itemView.getContext(), "contact_image_view Clicked", Toast.LENGTH_SHORT).show();
+//                    int adapterPosition = getAdapterPosition();
+//                    Toast.makeText(itemView.getContext(), "adapterPosition_Contact Clicked"+ adapterPosition, Toast.LENGTH_SHORT).show();
+//
+//                }
+//            });
+
+
+
+
+//            message_image_view.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                   // Toast.makeText(itemView.getContext(), "message_image_view Clicked", Toast.LENGTH_SHORT).show();
+//                    int adapterPosition = getAdapterPosition();
+//                    Toast.makeText(itemView.getContext(), "adapterPosition_Message Clicked"+ adapterPosition, Toast.LENGTH_SHORT).show();
+//                }
+//            });
+
+
 
         }
 
 
 
+//        private void click_contact_image_view(String title) {
+//            Toast.makeText(itemView.getContext(), "contact_image_view Clicked", Toast.LENGTH_SHORT).show();
+//        }
+//        private void click_message_image_view(String title) {
+//            Toast.makeText(itemView.getContext(), "message_image_view Clicked", Toast.LENGTH_SHORT).show();
+//        }
+
         private void setAppointment_Doctor_Name(String title) {
             post_doctor_name.setText(title);
-            //Log.d("LOGGED", "Doctor_Name: " + title);
         }
 
         private void setAppointment_Doctor_Phone(String title) {
@@ -610,7 +713,6 @@ public class Show_Appointments extends AppCompatActivity {
 
         private void setAppointment_Doctor_Email(String title) {
             post_doctor_email.setText(title);
-            //Log.d("LOGGED", "Doctor_Email: " + title);
         }
 
         private void setAppointment_Patient_Name(String title) {
