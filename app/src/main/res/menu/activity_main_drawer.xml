@@ -35,7 +35,7 @@
             android:title="@string/nav_blood" />
         <item
             android:id="@+id/nav_chat"
-            android:icon="@drawable/health_tips_icon"
+            android:icon="@drawable/chat"
             android:title="@string/nav_chat" />
 
         <item
@@ -43,9 +43,14 @@
             android:icon="@drawable/notification_icon"
             android:title="@string/nav_notifications" />
         <item
+            android:id="@+id/nav_home_health_care"
+            android:icon="@drawable/home_health_icon"
+            android:title="@string/nav_home_health_care" />
+        <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/profile_icon"
             android:title="@string/nav_profile" />
+
 
         <item
             android:id="@+id/nav_settings"

@@ -5,17 +5,17 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.text.Html;
+
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -26,6 +26,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.samin.paitientmanagement.R;
 import com.example.samin.paitientmanagement.activity.ChatActivity;
 import com.example.samin.paitientmanagement.activity.MainActivity;
+import com.example.samin.paitientmanagement.activity.PaitientManagement;
 import com.example.samin.paitientmanagement.activity.PersonalInfo;
 import com.example.samin.paitientmanagement.other.CircleTransform;
 import com.example.samin.paitientmanagement.other.DoctorDetails;
@@ -34,11 +35,8 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
-import java.util.Map;
 
-import static com.example.samin.paitientmanagement.activity.MainActivity.MainActivityLoaded;
 
 public class AppointmentFragment extends Fragment {
 
@@ -51,8 +49,12 @@ public class AppointmentFragment extends Fragment {
     public FirebaseRecyclerAdapter<UserDetails, DoctorDetailsViewHolder> mFirebaseAdapter_User;
     ProgressBar progressBar;
     LinearLayoutManager mLinearLayoutManager;
+    LinearLayout spinner_layout;
+    static String Doctor_Category ="All";
+
     Intent intent;
     //Boolean flag = true;
+    //static String test;
 
     public AppointmentFragment() {
         // Required empty public constructor
@@ -66,9 +68,36 @@ public class AppointmentFragment extends Fragment {
         firebaseDatabase = FirebaseDatabase.getInstance();
         //Log.d("LOGGED","onCreateView Called");
 
+//        if(PaitientManagement.app_user_type.equals("Doctor"))
+//        {
+//            Log.d("LOGGED", "putting test = Doctor: ");
+//            test = "Doctor";
+//        }
+//        else if (PaitientManagement.app_user_type.equals("Patient"))
+//        {
+//            Log.d("LOGGED", "putting test = Patient: ");
+//            test = "Patient";
+//        }
+//
+//        Log.d("LOGGED", "so,,, test = : " + test);
+//
+//        if(test.equals("Doctor"))
+//        {
+//            myRef = firebaseDatabase.getReference("User_Details");
+//        }
+//        else
+//        {
+//            myRef = firebaseDatabase.getReference("Doctor_Detais");
+//        }
+
+
+
         if(MainActivity.app_user_type.equals("Doctor"))
         {
             myRef = firebaseDatabase.getReference("User_Details");
+            Log.d("LOGGED", "I AM Doctor Called: " +myRef.toString());
+
+            //test = "Doctor";
 
            // myRef.orderByChild("User_Type").startAt("Patient");
             Log.d("LOGGED","My_REF : " + myRef.orderByChild("User_Type").startAt("Patient").toString());
@@ -77,11 +106,26 @@ public class AppointmentFragment extends Fragment {
         {
             myRef = firebaseDatabase.getReference("Doctor_Detais");
            // Log.d("LOGGED","My_REF : " + myRef);
+           // test = "Patients";
+            Log.d("LOGGED", "I AM Patient Called: " +myRef.toString());
         }
 
 
         myRef.keepSynced(true);
         Toast.makeText(getContext(), "Wait !  Fetching List...", Toast.LENGTH_SHORT).show();
+
+
+
+
+
+
+        //Toast.makeText(getContext(), "Testing: " + (MainActivity.app_user_type), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(), "Testing Static: " + test, Toast.LENGTH_SHORT).show();
+        Log.d("LOGGED", "Testing: " + (MainActivity.app_user_type));
+        Log.d("LOGGED", "Testing + PaitientManagement: " + (PaitientManagement.app_user_type));
+        //Log.d("LOGGED", "Testing Static: " + test);
+
+
     }
 
     @Override
@@ -117,7 +161,9 @@ public class AppointmentFragment extends Fragment {
 
 
 
-       spinner = (Spinner) v.findViewById(R.id.spinner);
+         spinner = (Spinner) v.findViewById(R.id.spinner);
+        spinner_layout =(LinearLayout) v.findViewById(R.id.appointmentPage_spinnerLayout);
+        //spinner.setPrompt("Select your favorite Planet!");
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
@@ -127,8 +173,18 @@ public class AppointmentFragment extends Fragment {
             {
                 if (!firstItem.equals(spinner.getSelectedItem()))
                 {
-                    Toast.makeText(parent.getContext(),"Doctors in " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(parent.getContext(),parent.getItemAtPosition(position).toString() + " Doctors", Toast.LENGTH_SHORT).show();
                     firstItem = String.valueOf(spinner.getSelectedItem());
+
+                    myRef = firebaseDatabase.getReference("Doctor_Detais");
+                    //myRef.orderByChild("Category").startAt(parent.getItemAtPosition(position).toString());
+
+                    Doctor_Category = parent.getItemAtPosition(position).toString();
+
+                   // Log.d("LOGGED", "onItemSelected Called: " +myRef.orderByChild("Category").startAt(parent.getItemAtPosition(position).toString()));
+                    //Log.d("LOGGED", "onItemSelected REFERENCE: " +myRef.toString());
+                    recyclerView.invalidate();
+                    onStart();
                 }
             }
 
@@ -146,15 +202,16 @@ public class AppointmentFragment extends Fragment {
     public void onStart() {
         super.onStart();
         progressBar.setVisibility(ProgressBar.VISIBLE);
-        if(MainActivityLoaded.equals("1"))
-        {
-            //Toast.makeText(getContext(), "Wait !  Fetching List...", Toast.LENGTH_SHORT).show();
-            MainActivityLoaded = "0";
-        }
+//        if(MainActivityLoaded.equals("1"))
+//        {
+//            //Toast.makeText(getContext(), "Wait !  Fetching List...", Toast.LENGTH_SHORT).show();
+//            MainActivityLoaded = "0";
+//        }
         //Log.d("LOGGED", "Will Start Calling populateViewHolder : ");
         //Log.d("LOGGED", "IN onStart ");
 
- if(MainActivity.app_user_type.equals("Patient"))
+ if(MainActivity.app_user_type.equals("Patient") || PaitientManagement.app_user_type.equals("Patient"))
+ //if(test.equals("Patient"))
  {
      //Log.d("LOGGED","app_user_type : " + MainActivity.app_user_type);
 
@@ -162,13 +219,30 @@ public class AppointmentFragment extends Fragment {
 
          public void populateViewHolder(final DoctorDetailsViewHolder viewHolder, DoctorDetails model, final int position) {
              //Log.d("LOGGED", "populateViewHolder Called: ");
+             //Log.d("LOGGED", "populateViewHolder Called: " +myRef.toString());
+
              progressBar.setVisibility(ProgressBar.INVISIBLE);
 
-             if (!model.getName().equals("Null")) {
-                 viewHolder.Doctor_Name(model.getName());
+             if (!model.getName().equals("Null") && (model.getCategory().equals(Doctor_Category)) || Doctor_Category.equals("All") ) {
+                 Log.d("LOGGED", "Doctors in : " +Doctor_Category);
+
+                 if(model.getName().equals("Null"))
+                 {
+                     viewHolder.Layout_hide();
+                     return;
+                 }
+                 else
+                 {
+                     viewHolder.Doctor_Name(model.getName());
+                 }
                  viewHolder.Doctor_Chamber(model.getChamber());
                  viewHolder.Doctor_Image_URL(model.getImage_Url());
                  viewHolder.Doctor_Specialization(model.getSpecialization());
+
+             }
+             else
+             {
+                 viewHolder.Layout_hide();
              }
 
 
@@ -238,8 +312,11 @@ public class AppointmentFragment extends Fragment {
      recyclerView.setAdapter(mFirebaseAdapter);
  }
 
- else if(MainActivity.app_user_type.equals("Doctor"))
+ else if(MainActivity.app_user_type.equals("Doctor") || PaitientManagement.app_user_type.equals("Doctor"))
+ //else if(test.equals("Doctor"))
  {
+     //spinner.setVisibility(View.GONE);
+     spinner_layout.setVisibility(View.GONE);
      //Log.d(" LOGGED ","app_user_type : " + MainActivity.app_user_type);
      mFirebaseAdapter_User = new FirebaseRecyclerAdapter<UserDetails, DoctorDetailsViewHolder>(UserDetails.class, R.layout.card_doctor_layout, DoctorDetailsViewHolder.class,
              myRef.orderByChild("Name_Present").startAt("YES").endAt("YES")) {
@@ -310,20 +387,33 @@ public class AppointmentFragment extends Fragment {
     public static class DoctorDetailsViewHolder extends RecyclerView.ViewHolder {
         private final TextView doctor_name, doctor_chamber, doctor_specialization;
         private final ImageView doctor_image;
+        private final LinearLayout layout;
+        final LinearLayout.LayoutParams params;
 
         public DoctorDetailsViewHolder(final View itemView) {
             super(itemView);
-            Log.d("LOGGED", "View Holder Called: ");
+           // Log.d("LOGGED", "View Holder Called: ");
             doctor_name = (TextView) itemView.findViewById(R.id.appointment_doctor_name);
             doctor_chamber = (TextView) itemView.findViewById(R.id.appointment_doctor_chamber);
             doctor_image = (ImageView) itemView.findViewById(R.id.appointment_doctor_image);
             doctor_specialization = (TextView) itemView.findViewById(R.id.appointment_doctor_spec);
+            layout = (LinearLayout)itemView.findViewById(R.id.show_appointment_single_item);
+            params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT); // This will need to Customize
         }
 
         private void Doctor_Name(String title) {
            // Log.d("LOGGED", "Setting Name: ");
             doctor_name.setText(title);
         }
+
+        private void Layout_hide() {
+            params.height = 0; // we set the Height to 0 and set this parameter to a particular layout...
+            //itemView.setLayoutParams(params);
+            layout.setLayoutParams(params);
+
+        }
+
+
 
         private void Doctor_Chamber(String title) {
             doctor_chamber.setText(title);

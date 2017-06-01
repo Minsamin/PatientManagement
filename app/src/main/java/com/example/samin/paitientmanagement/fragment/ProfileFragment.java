@@ -16,9 +16,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -53,6 +55,7 @@ public class ProfileFragment extends Fragment {
     private static final int GALLERY_INTENT = 2;
     private ProgressDialog mProgressDialog;
     public String UserID;
+
 
     Context context;
 
@@ -98,6 +101,7 @@ public class ProfileFragment extends Fragment {
 
             user_image = (ImageView) v.findViewById(R.id.profile_edit_image);
             change_image = (ImageView) v.findViewById(R.id.change_user_image);
+
 
 
             //For image
@@ -210,6 +214,39 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+
+//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+//        {
+//            String firstItem = String.valueOf(spinner.getSelectedItem());
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+//            {
+//                if (!firstItem.equals(spinner.getSelectedItem()))
+//                {
+//                    //Toast.makeText(parent.getContext(),"Doctors in " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
+//                    firstItem = String.valueOf(spinner.getSelectedItem());
+//
+//                    //myRef = firebaseDatabase.getReference("Doctor_Detais");
+//                    //myRef.orderByChild("Category").startAt(parent.getItemAtPosition(position).toString());
+//
+//                   // Doctor_Category = parent.getItemAtPosition(position).toString();
+//
+//                   // Log.d("LOGGED", "onItemSelected Called: " +myRef.orderByChild("Category").startAt(parent.getItemAtPosition(position).toString()));
+//                   // Log.d("LOGGED", "onItemSelected REFERENCE: " +myRef.toString());
+//                    //recyclerView.invalidate();
+//                    //onStart();
+//                }
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
+
+
+
+
             user_save_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -221,10 +258,15 @@ public class ProfileFragment extends Fragment {
                     final String mHeight = user_height.getText().toString().trim();
                     final String mWeight = user_weight.getText().toString().trim();
                     final String mBloodgroup = user_bloodgroup.getText().toString().trim();
+
+
+
+
                     if ((mName.isEmpty() || mPhone.isEmpty() || mAddress.isEmpty() || mAge.isEmpty() || mHeight.isEmpty() || mWeight.isEmpty() || mBloodgroup.isEmpty())) {
                         Toast.makeText(getContext(), "Fill all Field", Toast.LENGTH_SHORT).show();
                         return;
                     }
+
                     mRootRef.child("Name").setValue(mName);
 
                     mRootRef.child("Name_Present").setValue("YES");

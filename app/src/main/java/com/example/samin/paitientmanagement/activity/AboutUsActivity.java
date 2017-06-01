@@ -139,6 +139,15 @@ public class AboutUsActivity extends AppCompatActivity implements View.OnClickLi
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .into(img_huduk);
 
+//        Glide.with(AboutUsActivity.this)
+//                .load(R.drawable.nag_image)
+//                .crossFade()
+//                .thumbnail(0.5f)
+//                .placeholder(R.drawable.invalid_person_image)
+//                .bitmapTransform(new CircleTransform(AboutUsActivity.this))
+//                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+//                .into(img_nag);
+
          Glide.with(AboutUsActivity.this)
                 .load(R.drawable.invalid_person_image)
                 .crossFade()

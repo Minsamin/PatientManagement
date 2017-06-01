@@ -46,6 +46,7 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
     public void onCreate(Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_layout);
+       // Log.d("LOGGED", "LOGIN Application onCreate: ");
 
 
         //Static variable to finish this Activity on Sign up Complete
@@ -56,8 +57,11 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
         if(firebaseAuth.getCurrentUser() != null)
         {
             //User Already logged In
+            Intent i = new Intent(getApplicationContext(),MainActivity.class);
+            i.putExtra("user_type",getIntent().getStringExtra("user_type"));
             this.finish();
-            startActivity(new Intent(getApplicationContext(),MainActivity.class));
+            startActivity(i);
+            //startActivity(new Intent(getApplicationContext(),MainActivity.class));
         }
 
         login_Activity = this;

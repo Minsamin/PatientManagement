@@ -1,5 +1,6 @@
 package com.example.samin.paitientmanagement.fragment;
 
+import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,10 +16,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -59,6 +62,7 @@ public class ProfileFragment_Doctor extends Fragment {
     private EditText sun_am, sun_pm, mon_am, mon_pm, tues_am, tues_pm, wed_am, wed_pm, thu_am, thu_pm, fri_am, fri_pm, sat_am, sat_pm;
     private CheckBox sun, mon, tues, wed, thu, fri, sat;
     private Context context;
+    private Spinner spinner;
 
     public static final int READ_EXTERNAL_STORAGE = 0;
     //final ArrayList seletedItems=new ArrayList();
@@ -94,6 +98,7 @@ public class ProfileFragment_Doctor extends Fragment {
 
         doctor_image = (ImageView) v.findViewById(R.id.profile_edit_image);
         change_image = (ImageView) v.findViewById(R.id.change_user_image);
+        spinner = (Spinner) v.findViewById(R.id.profile_layout_edit_category);
 
 
 
@@ -589,8 +594,20 @@ public class ProfileFragment_Doctor extends Fragment {
                 String retrieve_Fees = dataSnapshot.child("Fees").getValue(String.class);
                 String retrieve_timing = dataSnapshot.child("Timing").getValue(String.class);
                 String retrieve_url = dataSnapshot.child("Image_URL").getValue(String.class);
+                //String retrieve_category = dataSnapshot.child("Category").getValue(String.class);
 
                 //Log.d("LOGGED", "onDataChange: v.context " + v.getContext());
+
+
+//               String[] arrayAdapter = getResources().getStringArray(R.array.android_dropdown_arrays);
+//               // spinner.setSelection(((ArrayAdapter<String>)spinner.getAdapter()).getPosition(""));
+//                if (!retrieve_category.matches("Null"))
+//                   // doctor_name.setText("");
+//                //else
+//                //spinner.setSelection(((ArrayAdapter<String>)spinner.getAdapter()).getPosition(""));
+//                spinner.setSelection(arrayAdapter.
+                    //doctor_name.setText(retrieve_name);
+
 
                 if (retrieve_name.matches("Null"))
                     doctor_name.setText("");
@@ -759,10 +776,20 @@ public class ProfileFragment_Doctor extends Fragment {
                     final String mExperience = doctor_Experience.getText().toString().trim();
                     final String mFees = doctor_Fees.getText().toString().trim();
                     final String mTiming = doctor_timing.getText().toString().trim().replace("[","").replace("]","");
+
+                    String Category = String.valueOf(spinner.getSelectedItem());
+
                     if ((mName.isEmpty() || mPhone.isEmpty() || mChamber.isEmpty() || mSpecialization.isEmpty() || mExperience.isEmpty() || mFees.isEmpty() || mTiming.isEmpty())) {
                         Toast.makeText(getContext(), "Fill all Field", Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    if(Category.equals("Choose Category"))
+                    {
+                        Toast.makeText(getContext(), "Choose Category", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    mRootRef.child("Category").setValue(Category);
 
                     mRootRef.child("Name").setValue(mName);
 

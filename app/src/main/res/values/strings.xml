@@ -16,6 +16,7 @@
     <string name="nav_patho">Pathology Labs</string>
     <string name="nav_blood">Blood Banks</string>
     <string name="nav_chat">Chat</string>
+    <string name="nav_home_health_care">Home Heath Care</string>
 
 
     <!-- Toolbar titles when navigation menu item is selected -->
@@ -30,6 +31,7 @@
         <item>Chat</item>
         <item>Notifications</item>
         <item>Profile</item>
+        <item>Home Heath Care</item>
         <item>Settings</item>
 
 
@@ -38,11 +40,23 @@
 
 
     <string-array name="android_dropdown_arrays">
+        <item>All</item>
         <item>Eye</item>
         <item>Orthopedics</item>
         <item>Dentist</item>
         <item>Cardiology</item>
         <item>Neurology</item>
+        <item>Physician</item>
+    </string-array>
+
+    <string-array name="category_dropdown_arrays">
+        <item>Choose Category</item>
+        <item>Eye</item>
+        <item>Orthopedics</item>
+        <item>Dentist</item>
+        <item>Cardiology</item>
+        <item>Neurology</item>
+        <item>Physician</item>
     </string-array>
     <string-array name="blood_group_array">
         <item>O−</item>
@@ -73,6 +87,14 @@
     <string name="about_ok">OK</string>
 
     <string name="changelog_body">
+
+        <b><u>PM 2.8 - Changes:</u></b>\n
+
+        &#8226; Home Page Icons Working. \n
+        &#8226; Home Health Page Included. \n
+        &#8226; Doctors will get Notification on Users Appointment. \n
+        &#8226; Search Doctors by Category. \n
+        &#8226; Icons Updated. \n\n
 
         <b><u>PM 2.7 - Changes:</u></b>\n
 

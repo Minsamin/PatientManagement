@@ -64,7 +64,7 @@ public class ChatActivity extends AppCompatActivity {
     DatabaseReference myRef,myRef2;
     private FirebaseRecyclerAdapter<Show_chat_data_item, ChatActivity.ChatDetailsViewHolder> mFirebaseAdapter;
     public LinearLayoutManager mLinearLayoutManager;
-    static String Sender_Name;
+    static String Sender_Name,USER_ID;
     ImageView attach_icon,send_icon,no_data_available_image;
     EditText message_area;
     private static final int GALLERY_INTENT = 2;
@@ -85,7 +85,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_chat);
 
-        String USER_ID = MainActivity.LoggedIn_User_Email.replace("@","").replace(".","");
+        USER_ID = MainActivity.LoggedIn_User_Email.replace("@","").replace(".","");
         firebaseDatabase = FirebaseDatabase.getInstance();
         myRef = FirebaseDatabase.getInstance().getReference().child("Chat").child(USER_ID).child(getIntent().getStringExtra("email").replace("@","").replace(".",""));
         myRef.keepSynced(true);
@@ -265,6 +265,11 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
 
     private  boolean checkPermissions() {
         int result;
@@ -543,7 +548,7 @@ public class ChatActivity extends AppCompatActivity {
                 {
                     chat_image_outgoing.setVisibility(View.VISIBLE);
                     message.setVisibility(View.GONE);
-                    Glide.with(mView.getContext())
+                    Glide.with(itemView.getContext())
                             .load(title)
                             .crossFade()
                             .fitCenter()
@@ -555,7 +560,7 @@ public class ChatActivity extends AppCompatActivity {
                 {
                     chat_image_incoming.setVisibility(View.VISIBLE);
                     message.setVisibility(View.GONE);
-                    Glide.with(mView.getContext())
+                    Glide.with(itemView.getContext())
                             .load(title)
                             .crossFade()
                             .fitCenter()

@@ -34,6 +34,7 @@ import com.example.samin.paitientmanagement.fragment.AppointmentFragment;
 import com.example.samin.paitientmanagement.fragment.BloodBankFragment;
 import com.example.samin.paitientmanagement.fragment.HealthTipsFragment;
 import com.example.samin.paitientmanagement.fragment.HomeFragment;
+import com.example.samin.paitientmanagement.fragment.Home_Health_Fragment;
 import com.example.samin.paitientmanagement.fragment.NotificationFragment;
 import com.example.samin.paitientmanagement.fragment.PathologyLabsFragment;
 import com.example.samin.paitientmanagement.fragment.PatientFragment;
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG_PATHOLOGY_LABS = "pathology labs";
     private static final String TAG_BLOOD_BANKS = "blood banks";
     private static final String TAG_CHAT = "chat";
+    private static final String TAG_HOME_HEALTH_CARE = "Home Health Care";
     public static String CURRENT_TAG = TAG_HOME;
 
     // toolbar titles respected to selected nav menu item
@@ -87,7 +89,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     DatabaseReference mRoofRef;
     FirebaseUser user;
-    private static FirebaseDatabase mDatabase;
+    //private static FirebaseDatabase mDatabase;
+    //static boolean isInitialized = false;
 
     static public String UserID,MainActivityLoaded;
     AlertDialog.Builder builder;
@@ -95,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
     public static String app_user_type = "null",LoggedIn_User_Email,Fragment_Title;
     public static int Device_Width;
     private boolean isInForeground=false;
+
+    public static String retrieve_type = "null";
 
 
 
@@ -118,12 +123,28 @@ public class MainActivity extends AppCompatActivity {
             finish();
             startActivity(new Intent(getApplicationContext(),login_activity.class));
         }
+        retrieve_type = getIntent().getStringExtra("user_type");
+        Log.d("LOGGED", "OnCreate-User_Type: " +retrieve_type);
 
-            if (mDatabase == null) {
-                mDatabase = FirebaseDatabase.getInstance();
-                //mDatabase.setPersistenceEnabled(true);
-                FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-            }
+
+//        try{
+//            if(!isInitialized){
+//                FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+//                isInitialized = true;
+//            }else {
+//                Log.d("LOGGED","Already Initialized");
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+
+
+
+//            if (mDatabase == null) {
+//                mDatabase = FirebaseDatabase.getInstance();
+//                //mDatabase.setPersistenceEnabled(true);
+//                FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+//            }
 
 
 
@@ -345,6 +366,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+//        loadNavHeader();
+//        setUpNavigationView();
+
         final DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
 
 
@@ -417,7 +441,7 @@ public class MainActivity extends AppCompatActivity {
 
                 String retrieve_name = dataSnapshot.child("Name").getValue(String.class);
                 String retrieve_url = dataSnapshot.child("Image_URL").getValue(String.class);
-                String retrieve_type = dataSnapshot.child("User_Type").getValue(String.class);
+                retrieve_type = dataSnapshot.child("User_Type").getValue(String.class);
 
 
 
@@ -427,7 +451,32 @@ public class MainActivity extends AppCompatActivity {
                 //HomeFragment hm = new HomeFragment();
 
                 drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                if(retrieve_type.equals("Doctor"))
+
+                if(retrieve_type == null)
+                {
+                    String User_Type = getIntent().getStringExtra("user_type");
+                    Log.d("LOGGED", "ERROR_SECTION-User_Type: " +User_Type);
+                    if(User_Type.equals("Doctor"))
+                    {
+                        Toast.makeText(MainActivity.this, "Welcome  !! ", Toast.LENGTH_SHORT).show();
+                        navigationView.getMenu().getItem(1).setVisible(false);
+                        navigationView.getMenu().getItem(3).setVisible(false);
+                        app_user_type = "Doctor";
+                        PaitientManagement setType = new PaitientManagement();
+                        setType.set_app_user_type("Doctor",user.getEmail().toString());
+                    }
+                    else if(User_Type.equals("Patient"))
+                    {
+                        app_user_type = "Patient";
+                        PaitientManagement setType = new PaitientManagement();
+                        setType.set_app_user_type("Patient",user.getEmail().toString());
+                        navigationView.getMenu().getItem(2).setVisible(false);
+                        Toast.makeText(MainActivity.this, "Welcome  !! ", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+
+                else if(retrieve_type.equals("Doctor"))
                 {
                     Toast.makeText(MainActivity.this, "Welcome  !! ", Toast.LENGTH_SHORT).show();
                     // Log.d("LOGGED", "I AM A DOCTOR: ");
@@ -435,13 +484,20 @@ public class MainActivity extends AppCompatActivity {
                     //navigationView.getMenu().getItem(2).setVisible(true);
                     navigationView.getMenu().getItem(3).setVisible(false);
                     app_user_type = "Doctor";
+                    PaitientManagement setType = new PaitientManagement();
+                    setType.set_app_user_type("Doctor",user.getEmail().toString());
 
                     //hm.get_started_button.setText("Lets Get Started !");
                 }
-                if(retrieve_type.equals("Patient"))
+                else if(retrieve_type.equals("Patient"))
                 {
                     //Log.d("LOGGED", "I AM A PATIENT: ");
                     app_user_type = "Patient";
+
+                    PaitientManagement setType = new PaitientManagement();
+                    setType.set_app_user_type("Patient",user.getEmail().toString());
+
+
                     navigationView.getMenu().getItem(2).setVisible(false);
                     //navigationView.getMenu().getItem(3).setVisible(true);
                     Toast.makeText(MainActivity.this, "Welcome  !! ", Toast.LENGTH_SHORT).show();
@@ -566,6 +622,24 @@ public class MainActivity extends AppCompatActivity {
         //drawer.openDrawer(drawer);
         drawer.openDrawer(Gravity.START);
     }
+    public void open_doctors_page(){
+        //drawer.openDrawer(drawer);
+        navItemIndex = 1;
+        CURRENT_TAG = TAG_APPOINTMENT;
+        loadHomeFragment();
+    }
+    public void open_chat(){
+        //drawer.openDrawer(drawer);
+        navItemIndex = 7;
+        CURRENT_TAG = TAG_CHAT;
+        loadHomeFragment();
+    }
+    public void open_health_tips(){
+        //drawer.openDrawer(drawer);
+        navItemIndex = 4;
+        CURRENT_TAG = TAG_HEALTH_TIPS;
+        loadHomeFragment();
+    }
     /***
      * Returns respected fragment that user
      * selected from navigation menu
@@ -655,6 +729,9 @@ public class MainActivity extends AppCompatActivity {
 
             case 10:
                 //settings fragment
+                return new Home_Health_Fragment();
+            case 11:
+                //settings fragment
                 return new SettingsFragment();
             default:
                 return new HomeFragment();
@@ -727,8 +804,12 @@ public class MainActivity extends AppCompatActivity {
                         navItemIndex = 9;
                         CURRENT_TAG = TAG_PROFILE;
                         break;
-                    case R.id.nav_settings:
+                    case R.id.nav_home_health_care:
                         navItemIndex = 10;
+                        CURRENT_TAG = TAG_HOME_HEALTH_CARE;
+                        break;
+                    case R.id.nav_settings:
+                        navItemIndex = 11;
                         CURRENT_TAG = TAG_SETTINGS;
                         break;
 
@@ -933,7 +1014,7 @@ public class MainActivity extends AppCompatActivity {
        // Log.d("LOGGED", "CREATE OPTION MENU: ");
 
         // show menu only when home fragment is selected
-        if (navItemIndex == 0 || navItemIndex==1 || navItemIndex==2 || navItemIndex==3 || navItemIndex==4 || navItemIndex==5 || navItemIndex==6 || navItemIndex==7 || navItemIndex==9) {
+        if (navItemIndex == 0 || navItemIndex==1 || navItemIndex==2 || navItemIndex==3 || navItemIndex==4 || navItemIndex==5 || navItemIndex==6 || navItemIndex==7 || navItemIndex==9 || navItemIndex==10 || navItemIndex==11) {
             getMenuInflater().inflate(R.menu.main, menu);
         }
 
@@ -956,7 +1037,14 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Logout user!", Toast.LENGTH_LONG).show();
             firebaseAuth.signOut();
             finish();
-            startActivity(new Intent(this,login_activity.class));
+
+            Intent intent = new Intent(this,login_activity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+
+
+
+            //startActivity(new Intent(this,login_activity.class));
             return true;
         }
 

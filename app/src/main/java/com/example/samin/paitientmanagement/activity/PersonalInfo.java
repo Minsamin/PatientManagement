@@ -3,7 +3,9 @@ package com.example.samin.paitientmanagement.activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.ActionBar;
@@ -27,13 +29,20 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.samin.paitientmanagement.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Scanner;
 
 
 public class PersonalInfo extends AppCompatActivity
@@ -48,6 +57,7 @@ public class PersonalInfo extends AppCompatActivity
     public String UserID;
     SimpleDateFormat current_date_format, current_time_format;
     CoordinatorLayout coordinatorLayout;
+    FirebaseUser user;
     Calendar myCal = Calendar.getInstance();
     DatePickerDialog.OnDateSetListener dpl = new DatePickerDialog.OnDateSetListener() {
 
@@ -221,7 +231,7 @@ public class PersonalInfo extends AppCompatActivity
             Toast.makeText(this, "Reason Require", Toast.LENGTH_SHORT).show();
             return;
         }
-        FirebaseUser user = firebaseAuth.getCurrentUser();
+        user = firebaseAuth.getCurrentUser();
         UserID=user.getEmail().replace("@","").replace(".","");
         //Firebase mRoofRef = new Firebase("https://patient-management-11e26.firebaseio.com/");
 
@@ -266,8 +276,138 @@ public class PersonalInfo extends AppCompatActivity
         your_phone.setText("");
         your_appoint_date.setText( current_date_format.format( new Date()));
         your_appoint_reason.setText("");
+
+        send_notification();
+        SetNotificationToDatabase();
         //view.scrollBy(10,10);
 
 
     }
+
+    public void send_notification()
+    {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                int SDK_INT = android.os.Build.VERSION.SDK_INT;
+                if (SDK_INT > 8) {
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                            .permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
+
+                    try {
+                        String jsonResponse;
+
+                        URL url = new URL("https://onesignal.com/api/v1/notifications");
+                        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                        con.setUseCaches(false);
+                        con.setDoOutput(true);
+                        con.setDoInput(true);
+
+                        con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                        con.setRequestProperty("Authorization", "Basic MmRkOGI3ODAtYzcwNi00ZmRhLWFiYjItMzZhMTdiNzY1YTBl");
+                        con.setRequestMethod("POST");
+
+                        String strJsonBody = "{"
+                                + "\"app_id\": \"d0bb9a8d-ae7a-4eef-b4f1-4b7b40992263\","
+
+                                + "\"filters\": [{\"field\": \"tag\"," +
+                                " \"key\": \"User_ID\"," +
+                                " \"relation\": \"=\", " +
+                                "\"value\": \"" + intent_email + "\"}],"
+
+                                + "\"data\": {\"Data\": \"Notification\"},"
+                                + "\"headings\": {\"en\": \"Appointment Request\"},"
+                                //+ "\"big_picture\": \"" + R.drawable.logo_pms + "\","
+                                + "\"large_icon\": \"" + R.drawable.logo_pms + "\","
+                                + "\"android_led_color\": \"#3949AB\","
+                                + "\"android_accent_color\": \"#3949AB\","
+
+                                + "\"android_background_layout\": " +
+                                // "{\"image\": \"http://3.bp.blogspot.com/-5GNtI62kFFw/U4DK7M_fNkI/AAAAAAAAADA/nvF-d_CfBsg/s1600/wp917d5eab_06.png\","
+                                "{\"headings_color\": \"9C27B0\"," +
+                                "\"contents_color\": \"00695C\"},"
+
+                                + "\"contents\": {\"en\": \"You Got an Appointment request \"}"
+                                + "}";
+
+                        System.out.println("strJsonBody:\n" + strJsonBody);
+
+                        byte[] sendBytes = strJsonBody.getBytes("UTF-8");
+                        con.setFixedLengthStreamingMode(sendBytes.length);
+
+                        OutputStream outputStream = con.getOutputStream();
+                        outputStream.write(sendBytes);
+
+                        int httpResponse = con.getResponseCode();
+                        System.out.println("httpResponse: " + httpResponse);
+
+                        if (httpResponse >= HttpURLConnection.HTTP_OK
+                                && httpResponse < HttpURLConnection.HTTP_BAD_REQUEST) {
+                            Scanner scanner = new Scanner(con.getInputStream(), "UTF-8");
+                            jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                            scanner.close();
+                        } else {
+                            Scanner scanner = new Scanner(con.getErrorStream(), "UTF-8");
+                            jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                            scanner.close();
+                        }
+                        System.out.println("jsonResponse:\n" + jsonResponse);
+
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+
+    public void SetNotificationToDatabase()
+    {
+        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference().child("User_Notification").child(intent_email.replace("@","").replace(".","")).push();
+        //rootRef.keepSynced(true);
+
+        rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                rootRef.child("Doctor_Email").setValue(intent_email);
+
+                rootRef.child("Notification_Date").setValue(current_date_format.format( new Date()));
+
+                rootRef.child("Notification_Time").setValue(current_time_format.format( new Date()));
+
+                rootRef.child("Notification_To").setValue(user.getEmail());
+
+                DatabaseReference mRootRef2 = FirebaseDatabase.getInstance().getReference().child("User_Details").child(UserID);
+                mRootRef2.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String Image = dataSnapshot.child("Image_URL").getValue(String.class);
+                        String Name = dataSnapshot.child("Name").getValue(String.class);
+                        rootRef.child("Notification_Image").setValue(Image);
+                        rootRef.child("Notification_Text").setValue("You Got an Appointment request from " + Name);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
 }

@@ -1,127 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-     android:layout_height="match_parent"
-    android:layout_width="wrap_content">
-
-
-<LinearLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/imageView16"
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="fitCenter"
-        app:srcCompat="@drawable/blood_request" />
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textView16"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="Select Blood Group"
-        android:textColor="@android:color/holo_red_light"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        <ImageView
+            android:id="@+id/imageView16"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/blood_request" />
 
-    <Spinner
-        android:id="@+id/spinner_blood_request"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:entries="@array/blood_group_array"
-        android:padding="15dp"
-        android:background="#e16d6d"/>
-
-    <TextView
-        android:id="@+id/textView17"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="Fill the form"
-        android:textColor="@android:color/holo_red_light"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/blood_request_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp">
-
-        <EditText
-            android:id="@+id/et_blood_request_name"
+        <TextView
+            android:id="@+id/textView16"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="true"
-            android:hint="Name"
-            android:inputType="textLongMessage"
-            android:maxLines="1"
-            android:selectAllOnFocus="true" />
-    </android.support.design.widget.TextInputLayout>
+            android:padding="10dp"
+            android:text="Select Blood Group"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-    <android.support.design.widget.TextInputLayout
-    android:id="@+id/blood_request_address"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="8dp">
-    <EditText
-        android:id="@+id/et_blood_request_address"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:focusable="true"
-        android:hint="Address"
-        android:inputType="textLongMessage"
-        android:maxLines="1"
-        android:selectAllOnFocus="true" />
-</android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/blood_request_phone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp">
-        <EditText
-            android:id="@+id/et_blood_request_phone"
+        <Spinner
+            android:id="@+id/spinner_blood_request"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="true"
-            android:hint="Phone"
-            android:inputType="number"
-            android:maxLines="1"
-            android:selectAllOnFocus="true" />
-    </android.support.design.widget.TextInputLayout>
-    <!--<android.support.design.widget.TextInputLayout-->
+            android:background="#e16d6d"
+            android:entries="@array/blood_group_array"
+            android:padding="15dp" />
+
+        <TextView
+            android:id="@+id/textView17"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Fill the form"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/blood_request_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp">
+
+            <EditText
+                android:id="@+id/et_blood_request_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:hint="Name"
+                android:inputType="textLongMessage"
+                android:maxLines="1"
+                android:selectAllOnFocus="true" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/blood_request_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp">
+
+            <EditText
+                android:id="@+id/et_blood_request_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:hint="Address"
+                android:inputType="textLongMessage"
+                android:maxLines="1"
+                android:selectAllOnFocus="true" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/blood_request_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp">
+
+            <EditText
+                android:id="@+id/et_blood_request_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:hint="Phone"
+                android:inputType="number"
+                android:maxLines="1"
+                android:selectAllOnFocus="true" />
+        </android.support.design.widget.TextInputLayout>
+        <!--<android.support.design.widget.TextInputLayout-->
         <!--android:id="@+id/blood_request_email"-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="wrap_content"-->
         <!--android:layout_margin="8dp">-->
         <!--<EditText-->
-            <!--android:id="@+id/et_blood_request_email"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:focusable="true"-->
-            <!--android:hint="Email"-->
-            <!--android:inputType="textEmailAddress"-->
-            <!--android:maxLines="1"-->
-            <!--android:selectAllOnFocus="true" />-->
-    <!--</android.support.design.widget.TextInputLayout>-->
+        <!--android:id="@+id/et_blood_request_email"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:focusable="true"-->
+        <!--android:hint="Email"-->
+        <!--android:inputType="textEmailAddress"-->
+        <!--android:maxLines="1"-->
+        <!--android:selectAllOnFocus="true" />-->
+        <!--</android.support.design.widget.TextInputLayout>-->
 
-    <Button
-        android:id="@+id/button_blood_request"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="50dp"
-        android:background="@android:color/holo_red_light"
-        android:text="REQUEST"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-</LinearLayout>
+        <Button
+            android:id="@+id/button_blood_request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="50dp"
+            android:background="@android:color/holo_red_light"
+            android:text="REQUEST"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 </ScrollView>

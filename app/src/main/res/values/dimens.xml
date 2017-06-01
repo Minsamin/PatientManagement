@@ -12,6 +12,5 @@
     <item name = "masked" type = "id" />
 
 
-    <dimen name="message_bubble_corners_radius">15dp</dimen>
 
 </resources>

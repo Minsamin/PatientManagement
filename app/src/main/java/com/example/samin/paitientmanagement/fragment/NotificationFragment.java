@@ -214,6 +214,7 @@ public class NotificationFragment extends Fragment {
 
 
         private void set_notification_image(String title) {
+            if(!title.equals("Null")) {
                 Glide.with(itemView.getContext())
                         .load(title)
                         .thumbnail(0.5f)
@@ -222,6 +223,17 @@ public class NotificationFragment extends Fragment {
                         .bitmapTransform(new CircleTransform(itemView.getContext()))
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(post_notification_image);
+            }
+            else
+            {
+                Glide.with(itemView.getContext())
+                        .load(R.drawable.default_avatar_large)
+                        .thumbnail(0.5f)
+                        .crossFade()
+                        .bitmapTransform(new CircleTransform(itemView.getContext()))
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(post_notification_image);
+            }
 
 
             }

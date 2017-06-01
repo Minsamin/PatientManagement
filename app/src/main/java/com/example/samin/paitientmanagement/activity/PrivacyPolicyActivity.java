@@ -17,5 +17,6 @@ public class PrivacyPolicyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.privacy_policy_layout);
 
+
     }
 }

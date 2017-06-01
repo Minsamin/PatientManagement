@@ -265,6 +265,15 @@ public class Create_account extends AppCompatActivity implements View.OnClickLis
     private void callLogin() {
 
         Intent i= new Intent(this,login_activity.class);
+        if(RB_doctor.isChecked())
+        {
+            i.putExtra("user_type","Doctor");
+        }
+
+        else
+        {
+            i.putExtra("user_type","Patient");
+        }
         login_activity.login_Activity.finish();
         finish();
         startActivity(i);

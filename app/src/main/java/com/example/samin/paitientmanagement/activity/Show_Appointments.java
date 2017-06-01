@@ -1,5 +1,6 @@
 package com.example.samin.paitientmanagement.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -281,7 +282,8 @@ public class Show_Appointments extends AppCompatActivity {
                                     //intent.putExtra("image_id",retrieve_url);
                                     intent.putExtra("email",Patient_email);
                                     intent.putExtra("name",Patient_name);
-                                   getApplicationContext().startActivity(intent);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    getApplicationContext().startActivity(intent);
 
 
                                 }

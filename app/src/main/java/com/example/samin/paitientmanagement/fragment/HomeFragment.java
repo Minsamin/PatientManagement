@@ -1,5 +1,6 @@
 package com.example.samin.paitientmanagement.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 
 import android.widget.Button;
 
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.daimajia.slider.library.Animations.DescriptionAnimation;
@@ -22,6 +24,8 @@ import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.example.samin.paitientmanagement.R;
+import com.example.samin.paitientmanagement.activity.AboutUsActivity;
+import com.example.samin.paitientmanagement.activity.Blood_Request_Activity;
 import com.example.samin.paitientmanagement.activity.MainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -42,6 +46,8 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
 
     public Button get_started_button;
     public String User_Email;
+    LinearLayout health_tips, appointment, chat, search_doctor;
+    //Boolean got_user_type = false;
     //private DrawerLayout drawer;
     public HomeFragment() {
         // Required empty public constructor
@@ -60,6 +66,10 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
         View v;
 
          v = inflater.inflate(R.layout.fragment_home, container, false);
+        health_tips = (LinearLayout)v.findViewById(R.id.home_health_tips_grid);
+        chat = (LinearLayout)v.findViewById(R.id.home_chat_grid);
+        appointment = (LinearLayout)v.findViewById(R.id.home_appointment_grid);
+        search_doctor = (LinearLayout)v.findViewById(R.id.home_search_doctor_grid);
 
 
         SliderLayout mDemoSlider = (SliderLayout) v.findViewById(R.id.slider);
@@ -84,7 +94,7 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
         for(String name : file_maps.keySet()){
             TextSliderView textSliderView = new TextSliderView(getContext());
             // initialize a SliderLayout
-            Log.d("LOGGED", "For Loop Executed with Name : " + name);
+            //Log.d("LOGGED", "For Loop Executed with Name : " + name);
             textSliderView
                     .description(name)
                     .image(file_maps.get(name))
@@ -156,9 +166,12 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
             @Override
             public void onClick(View v) {
                 if(MainActivity.app_user_type.equals("Doctor") || MainActivity.app_user_type.equals("Patient")) {
+
                     //Toast.makeText(getContext(), "Swipe from Left-Edge to right !", Toast.LENGTH_SHORT).show();
                     //drawer.openDrawer(null);
+                   // got_user_type = true;
                     ((MainActivity)getActivity()).openDrawer();
+
                 }
                 else
                     Toast.makeText(getContext(), "Wait...", Toast.LENGTH_SHORT).show();
@@ -181,6 +194,75 @@ public class HomeFragment extends Fragment implements BaseSliderView.OnSliderCli
 
 //        Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "fonts/RobotoCondensed-Regular.ttf");
 //        txt.setTypeface(font);
+
+
+
+        health_tips.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(MainActivity.app_user_type.equals("Doctor") || MainActivity.app_user_type.equals("Patient")) {
+
+                    ((MainActivity)getActivity()).open_health_tips();
+                }
+                else
+                    Toast.makeText(getContext(), "Wait...", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        appointment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(MainActivity.app_user_type.equals("Doctor") || MainActivity.app_user_type.equals("Patient")) {
+
+                    if(!MainActivity.app_user_type.equals("Doctor"))
+                    {
+                        ((MainActivity)getActivity()).open_doctors_page();
+                    }
+                    else
+                        Toast.makeText(getContext(), "Doctors cannot Make Appointment !", Toast.LENGTH_SHORT).show();
+                }
+                else
+                    Toast.makeText(getContext(), "Wait...", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        search_doctor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(MainActivity.app_user_type.equals("Doctor") || MainActivity.app_user_type.equals("Patient")) {
+                    if(!MainActivity.app_user_type.equals("Doctor"))
+                    {
+                        ((MainActivity)getActivity()).open_doctors_page();
+                    }
+                    else
+
+                    Toast.makeText(getContext(), "Doctors cannot Search DOCTORS !", Toast.LENGTH_SHORT).show();
+                }
+                else
+                    Toast.makeText(getContext(), "Wait...", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        chat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(MainActivity.app_user_type.equals("Doctor") || MainActivity.app_user_type.equals("Patient")) {
+
+                    ((MainActivity)getActivity()).open_chat();
+                }
+                else
+                    Toast.makeText(getContext(), "Wait...", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+
+
+
         return v;
     }
 

@@ -85,7 +85,7 @@
             app:layout_constraintLeft_toLeftOf="@+id/imageView13"
             app:layout_constraintRight_toRightOf="@+id/imageView13"
             app:layout_constraintTop_toTopOf="@+id/imageView13"
-            app:srcCompat="@drawable/invalid_person_image" />
+            app:srcCompat="@drawable/invalid_person_image"/>
 
 
         <TextView

@@ -4,7 +4,7 @@ package com.example.samin.paitientmanagement.other;
  * Created by samin on 11/6/2016.
  */
 public class DoctorDetails {
-    private String Name, Email, Phone, Specialization, Image_URL, Timing, Chamber, Experience, Fees,User_Type;
+    private String Name, Email, Phone, Specialization, Image_URL, Timing, Chamber, Experience, Fees,User_Type,Category;
 
 
 
@@ -13,7 +13,7 @@ public class DoctorDetails {
 
     }
 
-    public DoctorDetails(String name, String email, String phone, String specialization, String image_Url, String timing, String chamber, String experience, String fees,String user_type) {
+    public DoctorDetails(String name, String email, String phone, String specialization, String image_Url, String timing, String chamber, String experience, String fees,String user_type ,String category) {
         Name = name;
         Email = email;
         Phone = phone;
@@ -24,6 +24,7 @@ public class DoctorDetails {
         Experience = experience;
         Fees = fees;
         User_Type = user_type;
+        Category = category;
     }
 
     public String getName() {
@@ -32,6 +33,15 @@ public class DoctorDetails {
 
     public void setName(String name) {
         Name = name;
+    }
+
+
+    public String getCategory() {
+        return Category;
+    }
+
+    public void setCategory(String category) {
+        Category = category;
     }
 
     public String getEmail() {
