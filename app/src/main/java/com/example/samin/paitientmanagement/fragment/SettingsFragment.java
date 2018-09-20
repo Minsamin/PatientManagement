@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Map;
+import java.util.Set;
 
 public class SettingsFragment extends Fragment {
     CardView changelog,checkForUpdate;
@@ -75,49 +76,27 @@ public class SettingsFragment extends Fragment {
         checkForUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Get Version
-                final String version = BuildConfig.VERSION_NAME;
-                //Firebase myRef;
-                //myRef = new Firebase("https://patient-management-11e26.firebaseio.com/Update_APK");
-                DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child("Update_APK");
 
 
-                //Toast.makeText(getContext(), "Got Name !" +ss, Toast.LENGTH_LONG).show();
-                mRootRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        //Map<String, String> map = dataSnapshot.getValue(Map.class);
-                        String retrieve_url = dataSnapshot.child("Download_URL").getValue(String.class);
-                        String retrieve_version = dataSnapshot.child("Version").getValue(String.class);
-                        if(version.equals(retrieve_version))
-                        {
-                            Toast.makeText(getContext(), "You have Latest Version ! " + retrieve_version, Toast.LENGTH_SHORT).show();
-                        }
-                        else
-                        {
-                            Toast.makeText(getContext(), "Update Available ! " + retrieve_version, Toast.LENGTH_SHORT).show();
-                            //new Intent(Intent.ACTION_VIEW, Uri.parse(retrieve_url));
-                            //String url = "http://www.example.com";
-                            Intent i = new Intent(Intent.ACTION_VIEW);
-                            i.setData(Uri.parse(retrieve_url));
-                            startActivity(i);
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.androidea.samin.patientmanagement"));
+                startActivity(i);
 
 
-//                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                //Get Version
+//                final String version = BuildConfig.VERSION_NAME;
+//                //Firebase myRef;
+//                //myRef = new Firebase("https://patient-management-11e26.firebaseio.com/Update_APK");
+//                DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference().child("Update_APK");
+//
+//
+//                //Toast.makeText(getContext(), "Got Name !" +ss, Toast.LENGTH_LONG).show();
+//                mRootRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
 //                    @Override
-//                    public void onDataChange(com.firebase.client.DataSnapshot dataSnapshot) {
-//                        Map<String, String> map = dataSnapshot.getValue(Map.class);
-//                        String retrieve_url = map.get("Download_URL");
-//                        String retrieve_version = map.get("Version");
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        //Map<String, String> map = dataSnapshot.getValue(Map.class);
+//                        String retrieve_url = dataSnapshot.child("Download_URL").getValue(String.class);
+//                        String retrieve_version = dataSnapshot.child("Version").getValue(String.class);
 //                        if(version.equals(retrieve_version))
 //                        {
 //                            Toast.makeText(getContext(), "You have Latest Version ! " + retrieve_version, Toast.LENGTH_SHORT).show();
@@ -131,13 +110,45 @@ public class SettingsFragment extends Fragment {
 //                            i.setData(Uri.parse(retrieve_url));
 //                            startActivity(i);
 //                        }
+//
 //                    }
 //
 //                    @Override
-//                    public void onCancelled(FirebaseError firebaseError) {
+//                    public void onCancelled(DatabaseError databaseError) {
 //
 //                    }
 //                });
+//
+//
+////                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+////                    @Override
+////                    public void onDataChange(com.firebase.client.DataSnapshot dataSnapshot) {
+////                        Map<String, String> map = dataSnapshot.getValue(Map.class);
+////                        String retrieve_url = map.get("Download_URL");
+////                        String retrieve_version = map.get("Version");
+////                        if(version.equals(retrieve_version))
+////                        {
+////                            Toast.makeText(getContext(), "You have Latest Version ! " + retrieve_version, Toast.LENGTH_SHORT).show();
+////                        }
+////                        else
+////                        {
+////                            Toast.makeText(getContext(), "Update Available ! " + retrieve_version, Toast.LENGTH_SHORT).show();
+////                            //new Intent(Intent.ACTION_VIEW, Uri.parse(retrieve_url));
+////                            //String url = "http://www.example.com";
+////                            Intent i = new Intent(Intent.ACTION_VIEW);
+////                            i.setData(Uri.parse(retrieve_url));
+////                            startActivity(i);
+////                        }
+////                    }
+////
+////                    @Override
+////                    public void onCancelled(FirebaseError firebaseError) {
+////
+////                    }
+////                });
+//
+//
+
             }
         });
 

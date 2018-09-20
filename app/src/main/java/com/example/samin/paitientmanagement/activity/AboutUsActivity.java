@@ -112,11 +112,11 @@ public class AboutUsActivity extends AppCompatActivity implements View.OnClickLi
         github.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                String git="https://github.com/Minsamin/PatientManagement";
-//                Intent i = new Intent(Intent.ACTION_VIEW);
-//                i.setData(Uri.parse(git));
-//                startActivity(i);
-                Toast.makeText(AboutUsActivity.this, "Disabled Link for Security Reason..", Toast.LENGTH_SHORT).show();
+                String git="https://github.com/Minsamin/PatientManagement";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(git));
+                startActivity(i);
+                //Toast.makeText(AboutUsActivity.this, "Disabled Link for Security Reason..", Toast.LENGTH_SHORT).show();
             }
         });
 

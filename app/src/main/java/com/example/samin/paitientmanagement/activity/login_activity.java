@@ -35,7 +35,7 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
     private Button loginButton,signup_button, forget_password_button;
     private ProgressDialog PGD;
     private FirebaseAuth firebaseAuth;
-    private TextView forget_pass,new_user;
+    private TextView forget_pass,new_user,guestUser;
     private TextInputLayout password_Field;
     private Boolean flag=false;
     private String email,pass;
@@ -66,7 +66,7 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
 
         login_Activity = this;
 
-
+        guestUser = findViewById(R.id.guest_login);
         et_email = (EditText) findViewById(R.id.input_Email);
         et_pass =(EditText) findViewById(R.id.input_Password);
         loginButton = (Button) findViewById(R.id.login_button);
@@ -83,6 +83,35 @@ public class login_activity  extends AppCompatActivity implements View.OnClickLi
 
         //On click listener for login button
         loginButton.setOnClickListener(this);
+
+        guestUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                email = "saminali500@gmail.com";
+                pass = "123456";
+                PGD.setMessage("Please Wait...");
+                PGD.show();
+                firebaseAuth.fetchProvidersForEmail(email).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<ProviderQueryResult> task) {
+                        if(task.isSuccessful()){
+                            // getProviders() will return size 1. if email ID is available.
+
+                            if (task.getResult().getProviders().size() > 0) {
+                                validation_completed(email,pass);
+                                return;
+                            }
+                            Toast.makeText(login_activity.this, "Email Not Registered  !!", Toast.LENGTH_SHORT).show();
+                            PGD.dismiss();
+                        }
+                        else{
+                            PGD.dismiss();
+                            Toast.makeText(login_activity.this, " "+ task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
 
         //Change the Fonts of email and Password Test
         Typeface type = Typeface.createFromAsset(getAssets(),"fonts/RobotoCondensed-Bold.ttf");
